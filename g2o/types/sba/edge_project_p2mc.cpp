@@ -41,9 +41,8 @@ bool EdgeProjectP2MC::read(std::istream& is) {
 }
 
 bool EdgeProjectP2MC::write(std::ostream& os) const {
-  internal::writeVector(os, measurement());
-  writeInformationMatrix(os);
-  return os.good();
+  if (!internal::writeVector(os, measurement())) return false;
+  return writeInformationMatrix(os);
 }
 
 void EdgeProjectP2MC::computeError() {

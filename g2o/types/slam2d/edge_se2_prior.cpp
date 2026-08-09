@@ -43,11 +43,10 @@ void EdgeSE2Prior::initialEstimate(const OptimizableGraph::VertexSet& from,
 
 bool EdgeSE2Prior::read(std::istream& is) {
   Vector3 p;
-  internal::readVector(is, p);
+  if (!internal::readVector(is, p)) return false;
   setMeasurement(p);
   _inverseMeasurement = _measurement.inverse();
-  readInformationMatrix(is);
-  return true;
+  return readInformationMatrix(is);
 }
 
 bool EdgeSE2Prior::write(std::ostream& os) const {

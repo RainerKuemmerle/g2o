@@ -36,7 +36,7 @@ EdgeXYZPrior::EdgeXYZPrior() : BaseUnaryEdge<3, Vector3, VertexPointXYZ>() {
 }
 
 bool EdgeXYZPrior::read(std::istream& is) {
-  internal::readVector(is, _measurement);
+  if (!internal::readVector(is, _measurement)) return false;
   return readInformationMatrix(is);
 }
 

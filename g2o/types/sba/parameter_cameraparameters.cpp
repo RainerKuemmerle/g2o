@@ -41,19 +41,19 @@ CameraParameters::CameraParameters(double focal_length,
       baseline(baseline) {}
 
 bool CameraParameters::read(std::istream& is) {
-  is >> focal_length;
-  is >> principle_point[0];
-  is >> principle_point[1];
-  is >> baseline;
-  return true;
+  is >> focal_length
+     >> principle_point[0]
+     >> principle_point[1]
+     >> baseline;
+  return !is.fail();
 }
 
 bool CameraParameters::write(std::ostream& os) const {
-  os << focal_length << " ";
-  os << principle_point.x() << " ";
-  os << principle_point.y() << " ";
-  os << baseline << " ";
-  return true;
+  os << focal_length << " "
+     << principle_point.x() << " "
+     << principle_point.y() << " "
+     << baseline << " ";
+  return !os.fail();
 }
 
 Vector2 CameraParameters::cam_map(const Vector3& trans_xyz) const {

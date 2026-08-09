@@ -58,14 +58,14 @@ bool EdgeSE3PointXYZDisparity::resolveCaches() {
 }
 
 bool EdgeSE3PointXYZDisparity::read(std::istream& is) {
-  readParamIds(is);
-  internal::readVector(is, _measurement);
+  if (!readParamIds(is)) return false;
+  if (!internal::readVector(is, _measurement)) return false;
   return readInformationMatrix(is);
 }
 
 bool EdgeSE3PointXYZDisparity::write(std::ostream& os) const {
-  writeParamIds(os);
-  internal::writeVector(os, measurement());
+  if (!writeParamIds(os)) return false;
+  if (!internal::writeVector(os, measurement())) return false;
   return writeInformationMatrix(os);
 }
 

@@ -40,8 +40,8 @@ bool writeVector(std::ostream& os, const Eigen::DenseBase<Derived>& b) {
 
 template <typename Derived>
 bool readVector(std::istream& is, Eigen::DenseBase<Derived>& b) {
-  for (int i = 0; i < b.size() && is.good(); i++) is >> b(i);
-  return is.good() || is.eof();
+  for (int i = 0; i < b.size() && !is.fail(); i++) is >> b(i);
+  return !is.fail();
 }
 }  // namespace internal
 }  // namespace g2o

@@ -39,9 +39,8 @@ EdgeSE2PointXY::EdgeSE2PointXY()
     : BaseBinaryEdge<2, Vector2, VertexSE2, VertexPointXY>() {}
 
 bool EdgeSE2PointXY::read(std::istream& is) {
-  internal::readVector(is, _measurement);
-  readInformationMatrix(is);
-  return true;
+  if (!internal::readVector(is, _measurement)) return false;
+  return readInformationMatrix(is);
 }
 
 bool EdgeSE2PointXY::write(std::ostream& os) const {

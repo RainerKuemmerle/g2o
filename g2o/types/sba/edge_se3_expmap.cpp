@@ -33,13 +33,13 @@ EdgeSE3Expmap::EdgeSE3Expmap()
 
 bool EdgeSE3Expmap::read(std::istream& is) {
   Vector7 meas;
-  internal::readVector(is, meas);
+  if (!internal::readVector(is, meas)) return false;
   setMeasurement(SE3Quat(meas).inverse());
   return readInformationMatrix(is);
 }
 
 bool EdgeSE3Expmap::write(std::ostream& os) const {
-  internal::writeVector(os, measurement().inverse().toVector());
+  if (!internal::writeVector(os, measurement().inverse().toVector())) return false;
   return writeInformationMatrix(os);
 }
 

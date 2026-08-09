@@ -40,12 +40,12 @@ VertexLine2D::VertexLine2D() : BaseVertex<2, Line2D>(), p1Id(-1), p2Id(-1) {
 
 bool VertexLine2D::read(std::istream& is) {
   is >> _estimate[0] >> _estimate[1] >> p1Id >> p2Id;
-  return true;
+  return !is.fail();
 }
 
 bool VertexLine2D::write(std::ostream& os) const {
   os << estimate()(0) << " " << estimate()(1) << " " << p1Id << " " << p2Id;
-  return os.good();
+  return !os.fail();
 }
 
 #ifdef G2O_HAVE_OPENGL

@@ -34,7 +34,7 @@ VertexSE3Expmap::VertexSE3Expmap() : BaseVertex<6, SE3Quat>() {}
 
 bool VertexSE3Expmap::read(std::istream& is) {
   Vector7 est;
-  internal::readVector(is, est);
+  if (!internal::readVector(is, est)) return false;
   setEstimate(SE3Quat(est).inverse());
   return true;
 }

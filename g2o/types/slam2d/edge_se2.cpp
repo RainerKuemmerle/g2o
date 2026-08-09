@@ -37,11 +37,10 @@ EdgeSE2::EdgeSE2() : BaseBinaryEdge<3, SE2, VertexSE2, VertexSE2>() {}
 
 bool EdgeSE2::read(std::istream& is) {
   Vector3 p;
-  internal::readVector(is, p);
+  if (!internal::readVector(is, p)) return false;
   setMeasurement(SE2(p));
   _inverseMeasurement = measurement().inverse();
-  readInformationMatrix(is);
-  return is.good() || is.eof();
+  return readInformationMatrix(is);
 }
 
 bool EdgeSE2::write(std::ostream& os) const {

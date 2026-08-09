@@ -8,6 +8,7 @@ add_executable(unittest_general
   robust_kernel_tests.cpp
   sparse_block_matrix.cpp
   partially_initialize.cpp
+  io_truncated_input.cpp
 )
 target_link_libraries(unittest_general types_slam3d types_slam2d)
 create_test(unittest_general)

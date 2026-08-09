@@ -50,8 +50,8 @@ bool EdgeSE3XYZPrior::resolveCaches() {
 }
 
 bool EdgeSE3XYZPrior::read(std::istream& is) {
-  readParamIds(is);
-  internal::readVector(is, _measurement);
+  if (!readParamIds(is)) return false;
+  if (!internal::readVector(is, _measurement)) return false;
   return readInformationMatrix(is);
 }
 

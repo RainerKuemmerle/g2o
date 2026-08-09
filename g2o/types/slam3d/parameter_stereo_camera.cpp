@@ -36,7 +36,7 @@ ParameterStereoCamera::ParameterStereoCamera()
 bool ParameterStereoCamera::read(std::istream& is) {
   bool state = ParameterCamera::read(is);
   is >> _baseline;
-  return is.good() && state;
+  return !is.fail() && state;
 }
 
 bool ParameterStereoCamera::write(std::ostream& os) const {

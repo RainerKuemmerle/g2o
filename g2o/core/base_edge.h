@@ -171,12 +171,12 @@ class BaseEdge : public OptimizableGraph::Edge {
   //! reads the upper triangular part of the matrix and recovers the missing
   //! symmetrical elements
   bool readInformationMatrix(std::istream& is) {
-    for (int i = 0; i < information().rows() && is.good(); ++i)
-      for (int j = i; j < information().cols() && is.good(); ++j) {
+    for (int i = 0; i < information().rows() && !is.fail(); ++i)
+      for (int j = i; j < information().cols() && !is.fail(); ++j) {
         is >> information()(i, j);
         if (i != j) information()(j, i) = information()(i, j);
       }
-    return is.good() || is.eof();
+    return !is.fail();
   }
   //! write the param IDs that are potentially used by the edge
   bool writeParamIds(std::ostream& os) const {
@@ -190,7 +190,7 @@ class BaseEdge : public OptimizableGraph::Edge {
       is >> paramId;
       setParameterId(i, paramId);
     }
-    return is.good() || is.eof();
+    return !is.fail();
   }
 
  public:

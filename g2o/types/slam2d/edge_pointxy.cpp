@@ -41,10 +41,9 @@ EdgePointXY::EdgePointXY()
 
 bool EdgePointXY::read(std::istream& is) {
   Vector2 p;
-  internal::readVector(is, p);
+  if (!internal::readVector(is, p)) return false;
   setMeasurement(p);
-  readInformationMatrix(is);
-  return true;
+  return readInformationMatrix(is);
 }
 
 bool EdgePointXY::write(std::ostream& os) const {

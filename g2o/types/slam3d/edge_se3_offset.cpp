@@ -61,24 +61,22 @@ bool EdgeSE3Offset::resolveCaches() {
 }
 
 bool EdgeSE3Offset::read(std::istream& is) {
-  bool state = readParamIds(is);
+  if (!readParamIds(is)) return false;
 
   Vector7 meas;
-  state &= internal::readVector(is, meas);
+  if (!internal::readVector(is, meas)) return false;
   // normalize the quaternion to recover numerical precision lost by storing as
   // human readable text
   Vector4::MapType(meas.data() + 3).normalize();
   setMeasurement(internal::fromVectorQT(meas));
 
-  state &= readInformationMatrix(is);
-  return state;
+  return readInformationMatrix(is);
 }
 
 bool EdgeSE3Offset::write(std::ostream& os) const {
-  writeParamIds(os);
-  internal::writeVector(os, internal::toVectorQT(_measurement));
-  writeInformationMatrix(os);
-  return os.good();
+  if (!writeParamIds(os)) return false;
+  if (!internal::writeVector(os, internal::toVectorQT(_measurement))) return false;
+  return writeInformationMatrix(os);
 }
 
 void EdgeSE3Offset::computeError() {

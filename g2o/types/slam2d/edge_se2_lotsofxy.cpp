@@ -55,6 +55,7 @@ void EdgeSE2LotsOfXY::computeError() {
 
 bool EdgeSE2LotsOfXY::read(std::istream& is) {
   is >> _observedPoints;
+  if (is.fail()) return false;
   setSize(_observedPoints + 1);
 
   // read the measurements
@@ -62,15 +63,18 @@ bool EdgeSE2LotsOfXY::read(std::istream& is) {
     unsigned int index = 2 * i;
     is >> _measurement[index] >> _measurement[index + 1];
   }
+  if (is.fail()) return false;
 
-  // read the information matrix
+  // read the upper triangle of the information matrix
   for (unsigned int i = 0; i < _observedPoints * 2; i++) {
-    // fill the "upper triangle" part of the matrix
     for (unsigned int j = i; j < _observedPoints * 2; j++) {
       is >> information()(i, j);
     }
+  }
+  if (is.fail()) return false;
 
-    // fill the lower triangle part
+  // mirror to fill the lower triangle
+  for (unsigned int i = 0; i < _observedPoints * 2; i++) {
     for (unsigned int j = 0; j < i; j++) {
       information()(i, j) = information()(j, i);
     }
@@ -96,7 +100,7 @@ bool EdgeSE2LotsOfXY::write(std::ostream& os) const {
     }
   }
 
-  return os.good();
+  return !os.fail();
 }
 
 void EdgeSE2LotsOfXY::linearizeOplus() {

@@ -32,9 +32,8 @@ EdgeSE2XYPrior::EdgeSE2XYPrior()
     : BaseUnaryEdge<2, Vector2, g2o::VertexSE2>() {}
 
 bool EdgeSE2XYPrior::read(std::istream& is) {
-  internal::readVector(is, _measurement);
-  readInformationMatrix(is);
-  return true;
+  if (!internal::readVector(is, _measurement)) return false;
+  return readInformationMatrix(is);
 }
 
 bool EdgeSE2XYPrior::write(std::ostream& os) const {

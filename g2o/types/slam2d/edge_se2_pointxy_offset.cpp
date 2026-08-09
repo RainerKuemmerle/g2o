@@ -55,19 +55,22 @@ bool EdgeSE2PointXYOffset::resolveCaches() {
 bool EdgeSE2PointXYOffset::read(std::istream& is) {
   int pId;
   is >> pId;
-  setParameterId(0, pId);
+  if (!setParameterId(0, pId)) return false;
   // measured keypoint
-  internal::readVector(is, _measurement);
-  if (is.bad()) return false;
-  readInformationMatrix(is);
-  //  we overwrite the information matrix in case of read errors
-  if (is.bad()) information().setIdentity();
+  if (!internal::readVector(is, _measurement)) return false;
+
+  // Information-matrix read is best-effort: legacy graph files sometimes
+  // omit it, so fall back to identity rather than failing the edge.
+  if (!readInformationMatrix(is)) {
+    information().setIdentity();
+    is.clear();
+  }
   return true;
 }
 
 bool EdgeSE2PointXYOffset::write(std::ostream& os) const {
   os << offsetParam->id() << " ";
-  internal::writeVector(os, measurement());
+  if (!internal::writeVector(os, measurement())) return false;
   return writeInformationMatrix(os);
 }
 

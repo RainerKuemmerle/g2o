@@ -66,13 +66,14 @@ bool EdgeSE2Offset::read(std::istream& is) {
   if (!setParameterId(1, pidTo)) return false;
 
   Vector3 meas;
-  internal::readVector(is, meas);
+  if (!internal::readVector(is, meas)) return false;
   setMeasurement(SE2(meas));
-  if (is.bad()) return false;
-  readInformationMatrix(is);
-  if (is.bad()) {
-    //  we overwrite the information matrix with the Identity
+
+  // Information-matrix read is best-effort: legacy graph files sometimes
+  // omit it, so fall back to identity rather than failing the edge.
+  if (!readInformationMatrix(is)) {
     information().setIdentity();
+    is.clear();
   }
   return true;
 }

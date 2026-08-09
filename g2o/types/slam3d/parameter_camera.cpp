@@ -62,24 +62,25 @@ void ParameterCamera::setKcam(double fx, double fy, double cx, double cy) {
 
 bool ParameterCamera::read(std::istream& is) {
   Vector7 off;
-  internal::readVector(is, off);
+  if (!internal::readVector(is, off)) return false;
   // normalize the quaternion to recover numerical precision lost by storing as
   // human readable text
   Vector4::MapType(off.data() + 3).normalize();
   setOffset(internal::fromVectorQT(off));
   double fx, fy, cx, cy;
   is >> fx >> fy >> cx >> cy;
+  if (is.fail()) return false;
   setKcam(fx, fy, cx, cy);
-  return is.good();
+  return true;
 }
 
 bool ParameterCamera::write(std::ostream& os) const {
-  internal::writeVector(os, internal::toVectorQT(_offset));
-  os << _Kcam(0, 0) << " ";
-  os << _Kcam(1, 1) << " ";
-  os << _Kcam(0, 2) << " ";
-  os << _Kcam(1, 2) << " ";
-  return os.good();
+  if (!internal::writeVector(os, internal::toVectorQT(_offset))) return false;
+  os << _Kcam(0, 0) << " "
+     << _Kcam(1, 1) << " "
+     << _Kcam(0, 2) << " "
+     << _Kcam(1, 2) << " ";
+  return !os.fail();
 }
 
 bool CacheCamera::resolveDependencies() {

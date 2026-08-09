@@ -35,15 +35,16 @@ EdgeSBAScale::EdgeSBAScale()
 bool EdgeSBAScale::read(std::istream& is) {
   double meas;
   is >> meas;
+  if (is.fail()) return false;
   setMeasurement(meas);
   information().setIdentity();
   is >> information()(0, 0);
-  return true;
+  return !is.fail();
 }
 
 bool EdgeSBAScale::write(std::ostream& os) const {
   os << measurement() << " " << information()(0, 0);
-  return os.good();
+  return !os.fail();
 }
 
 void EdgeSBAScale::initialEstimate(const OptimizableGraph::VertexSet& from_,

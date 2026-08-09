@@ -32,15 +32,13 @@ EdgeLine2DPointXY::EdgeLine2DPointXY()
     : BaseBinaryEdge<1, double, VertexLine2D, VertexPointXY>() {}
 
 bool EdgeLine2DPointXY::read(std::istream& is) {
-  is >> _measurement;
-  is >> information()(0, 0);
-  return true;
+  is >> _measurement >> information()(0, 0);
+  return !is.fail();
 }
 
 bool EdgeLine2DPointXY::write(std::ostream& os) const {
-  os << measurement() << " ";
-  os << information()(0, 0);
-  return os.good();
+  os << measurement() << " " << information()(0, 0);
+  return !os.fail();
 }
 
 }  // namespace g2o

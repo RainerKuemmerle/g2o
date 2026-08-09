@@ -54,19 +54,17 @@ bool EdgeSE3Prior::resolveCaches() {
 }
 
 bool EdgeSE3Prior::read(std::istream& is) {
-  bool state = readParamIds(is);
+  if (!readParamIds(is)) return false;
   Vector7 meas;
-  state &= internal::readVector(is, meas);
+  if (!internal::readVector(is, meas)) return false;
   setMeasurement(internal::fromVectorQT(meas));
-  state &= readInformationMatrix(is);
-  return state;
+  return readInformationMatrix(is);
 }
 
 bool EdgeSE3Prior::write(std::ostream& os) const {
-  writeParamIds(os);
-  internal::writeVector(os, internal::toVectorQT(measurement()));
-  writeInformationMatrix(os);
-  return os.good();
+  if (!writeParamIds(os)) return false;
+  if (!internal::writeVector(os, internal::toVectorQT(measurement()))) return false;
+  return writeInformationMatrix(os);
 }
 
 void EdgeSE3Prior::computeError() {

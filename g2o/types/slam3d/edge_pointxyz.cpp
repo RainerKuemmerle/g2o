@@ -37,11 +37,16 @@ EdgePointXYZ::EdgePointXYZ()
 bool EdgePointXYZ::read(std::istream& is) {
   Vector3 p;
   is >> p[0] >> p[1] >> p[2];
+  if (is.fail()) return false;
   setMeasurement(p);
   for (int i = 0; i < 3; ++i)
     for (int j = i; j < 3; ++j) {
       is >> information()(i, j);
-      if (i != j) information()(j, i) = information()(i, j);
+    }
+  if (is.fail()) return false;
+  for (int i = 0; i < 3; ++i)
+    for (int j = i + 1; j < 3; ++j) {
+      information()(j, i) = information()(i, j);
     }
   return true;
 }
@@ -51,7 +56,7 @@ bool EdgePointXYZ::write(std::ostream& os) const {
   os << p.x() << " " << p.y() << " " << p.z();
   for (int i = 0; i < 3; ++i)
     for (int j = i; j < 3; ++j) os << " " << information()(i, j);
-  return os.good();
+  return !os.fail();
 }
 
 #ifndef NUMERIC_JACOBIAN_THREE_D_TYPES

@@ -50,14 +50,14 @@ bool EdgeSE3PointXYZDepth::resolveCaches() {
 }
 
 bool EdgeSE3PointXYZDepth::read(std::istream& is) {
-  readParamIds(is);
-  internal::readVector(is, _measurement);  // measured keypoint
+  if (!readParamIds(is)) return false;
+  if (!internal::readVector(is, _measurement)) return false;  // measured keypoint
   return readInformationMatrix(is);
 }
 
 bool EdgeSE3PointXYZDepth::write(std::ostream& os) const {
-  writeParamIds(os);
-  internal::writeVector(os, measurement());
+  if (!writeParamIds(os)) return false;
+  if (!internal::writeVector(os, measurement())) return false;
   return writeInformationMatrix(os);
 }
 

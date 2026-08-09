@@ -57,6 +57,7 @@ static void jac_quat3_euler3(Eigen::Matrix<double, 6, 6, Eigen::ColMajor>& J,
 bool EdgeSE3Euler::read(std::istream& is) {
   Vector6 meas;
   for (int i = 0; i < 6; i++) is >> meas[i];
+  if (is.fail()) return false;
   Isometry3 transf = g2o::internal::fromVectorET(meas);
   Matrix<double, 6, 6, Eigen::ColMajor> infMatEuler;
   for (int i = 0; i < 6; i++)
@@ -64,6 +65,7 @@ bool EdgeSE3Euler::read(std::istream& is) {
       is >> infMatEuler(i, j);
       if (i != j) infMatEuler(j, i) = infMatEuler(i, j);
     }
+  if (is.fail()) return false;
   Matrix<double, 6, 6, Eigen::ColMajor> J;
   jac_quat3_euler3(J, transf);
   Matrix<double, 6, 6, Eigen::ColMajor> infMat =
@@ -87,7 +89,7 @@ bool EdgeSE3Euler::write(std::ostream& os) const {
     for (int j = i; j < 6; j++) {
       os << " " << infMatEuler(i, j);
     }
-  return os.good();
+  return !os.fail();
 }
 
 }  // namespace g2o

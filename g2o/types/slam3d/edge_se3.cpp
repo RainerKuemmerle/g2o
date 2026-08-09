@@ -42,14 +42,12 @@ EdgeSE3::EdgeSE3() : BaseBinaryEdge<6, Isometry3, VertexSE3, VertexSE3>() {
 
 bool EdgeSE3::read(std::istream& is) {
   Vector7 meas;
-  internal::readVector(is, meas);
+  if (!internal::readVector(is, meas)) return false;
   // normalize the quaternion to recover numerical precision lost by storing as
   // human readable text
   Vector4::MapType(meas.data() + 3).normalize();
   setMeasurement(internal::fromVectorQT(meas));
-  if (is.bad()) return false;
-  readInformationMatrix(is);
-  return is.good() || is.eof();
+  return readInformationMatrix(is);
 }
 
 bool EdgeSE3::write(std::ostream& os) const {

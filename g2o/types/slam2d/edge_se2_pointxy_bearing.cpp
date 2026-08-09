@@ -74,12 +74,12 @@ void EdgeSE2PointXYBearing::linearizeOplus() {
 
 bool EdgeSE2PointXYBearing::read(std::istream& is) {
   is >> _measurement >> information()(0, 0);
-  return true;
+  return !is.fail();
 }
 
 bool EdgeSE2PointXYBearing::write(std::ostream& os) const {
   os << measurement() << " " << information()(0, 0);
-  return os.good();
+  return !os.fail();
 }
 
 EdgeSE2PointXYBearingWriteGnuplotAction::

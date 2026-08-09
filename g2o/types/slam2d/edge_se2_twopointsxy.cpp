@@ -56,10 +56,12 @@ void EdgeSE2TwoPointsXY::computeError() {
 bool EdgeSE2TwoPointsXY::read(std::istream& is) {
   is >> _measurement[0] >> _measurement[1] >> _measurement[2] >>
       _measurement[3];
+  if (is.fail()) return false;
   is >> information()(0, 0) >> information()(0, 1) >> information()(0, 2) >>
       information()(0, 3) >> information()(1, 1) >> information()(1, 2) >>
       information()(1, 3) >> information()(2, 2) >> information()(2, 3) >>
       information()(3, 3);
+  if (is.fail()) return false;
   information()(1, 0) = information()(0, 1);
   information()(2, 0) = information()(0, 2);
   information()(2, 1) = information()(1, 2);
@@ -77,7 +79,7 @@ bool EdgeSE2TwoPointsXY::write(std::ostream& os) const {
      << information()(1, 1) << " " << information()(1, 2) << " "
      << information()(1, 3) << " " << information()(2, 2) << " "
      << information()(2, 3) << " " << information()(3, 3);
-  return os.good();
+  return !os.fail();
 }
 
 void EdgeSE2TwoPointsXY::initialEstimate(

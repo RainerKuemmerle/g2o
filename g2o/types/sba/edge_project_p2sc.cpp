@@ -35,14 +35,13 @@ EdgeProjectP2SC::EdgeProjectP2SC()
     : BaseBinaryEdge<3, Vector3, VertexPointXYZ, VertexCam>() {}
 
 bool EdgeProjectP2SC::read(std::istream& is) {
-  internal::readVector(is, _measurement);
+  if (!internal::readVector(is, _measurement)) return false;
   return readInformationMatrix(is);
 }
 
 bool EdgeProjectP2SC::write(std::ostream& os) const {
-  internal::writeVector(os, measurement());
-  writeInformationMatrix(os);
-  return os.good();
+  if (!internal::writeVector(os, measurement())) return false;
+  return writeInformationMatrix(os);
 }
 
 // return the error estimate as a 2-vector

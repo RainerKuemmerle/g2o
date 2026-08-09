@@ -112,6 +112,7 @@ void EdgeSE3LotsOfXYZ::linearizeOplus() {
 
 bool EdgeSE3LotsOfXYZ::read(std::istream& is) {
   is >> _observedPoints;
+  if (is.fail()) return false;
 
   setSize(_observedPoints + 1);
 
@@ -121,15 +122,18 @@ bool EdgeSE3LotsOfXYZ::read(std::istream& is) {
     is >> _measurement[index] >> _measurement[index + 1] >>
         _measurement[index + 2];
   }
+  if (is.fail()) return false;
 
-  // read the information matrix
+  // read the upper triangle of the information matrix
   for (unsigned int i = 0; i < _observedPoints * 3; i++) {
-    // fill the "upper triangle" part of the matrix
     for (unsigned int j = i; j < _observedPoints * 3; j++) {
       is >> information()(i, j);
     }
+  }
+  if (is.fail()) return false;
 
-    // fill the lower triangle part
+  // mirror to fill the lower triangle
+  for (unsigned int i = 0; i < _observedPoints * 3; i++) {
     for (unsigned int j = 0; j < i; j++) {
       information()(i, j) = information()(j, i);
     }
@@ -154,7 +158,7 @@ bool EdgeSE3LotsOfXYZ::write(std::ostream& os) const {
       os << " " << information()(i, j);
     }
   }
-  return os.good();
+  return !os.fail();
 }
 
 void EdgeSE3LotsOfXYZ::initialEstimate(const OptimizableGraph::VertexSet& fixed,

@@ -39,9 +39,8 @@ EdgeXYPrior::EdgeXYPrior() : BaseUnaryEdge<2, Vector2, VertexPointXY>() {
 }
 
 bool EdgeXYPrior::read(std::istream& is) {
-  internal::readVector(is, _measurement);
-  readInformationMatrix(is);
-  return true;
+  if (!internal::readVector(is, _measurement)) return false;
+  return readInformationMatrix(is);
 }
 
 bool EdgeXYPrior::write(std::ostream& os) const {
