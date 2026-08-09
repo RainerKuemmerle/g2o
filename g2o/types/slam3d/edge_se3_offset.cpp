@@ -75,7 +75,8 @@ bool EdgeSE3Offset::read(std::istream& is) {
 
 bool EdgeSE3Offset::write(std::ostream& os) const {
   if (!writeParamIds(os)) return false;
-  if (!internal::writeVector(os, internal::toVectorQT(_measurement))) return false;
+  if (!internal::writeVector(os, internal::toVectorQT(_measurement)))
+    return false;
   return writeInformationMatrix(os);
 }
 

@@ -51,7 +51,8 @@ bool EdgeSE3PointXYZDepth::resolveCaches() {
 
 bool EdgeSE3PointXYZDepth::read(std::istream& is) {
   if (!readParamIds(is)) return false;
-  if (!internal::readVector(is, _measurement)) return false;  // measured keypoint
+  if (!internal::readVector(is, _measurement))
+    return false;  // measured keypoint
   return readInformationMatrix(is);
 }
 

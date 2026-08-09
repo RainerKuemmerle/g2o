@@ -41,18 +41,13 @@ CameraParameters::CameraParameters(double focal_length,
       baseline(baseline) {}
 
 bool CameraParameters::read(std::istream& is) {
-  is >> focal_length
-     >> principle_point[0]
-     >> principle_point[1]
-     >> baseline;
+  is >> focal_length >> principle_point[0] >> principle_point[1] >> baseline;
   return !is.fail();
 }
 
 bool CameraParameters::write(std::ostream& os) const {
-  os << focal_length << " "
-     << principle_point.x() << " "
-     << principle_point.y() << " "
-     << baseline << " ";
+  os << focal_length << " " << principle_point.x() << " " << principle_point.y()
+     << " " << baseline << " ";
   return !os.fail();
 }
 

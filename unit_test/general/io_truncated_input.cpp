@@ -44,8 +44,8 @@ TEST(IoTruncatedInput, CompleteRecordReadsSuccessfully) {
 
   EdgeSE2 in;
   ASSERT_TRUE(in.read(data));
-  EXPECT_TRUE(out.measurement().toVector().isApprox(
-      in.measurement().toVector(), 1e-9));
+  EXPECT_TRUE(
+      out.measurement().toVector().isApprox(in.measurement().toVector(), 1e-9));
   EXPECT_TRUE(out.information().isApprox(in.information(), 1e-9));
 }
 

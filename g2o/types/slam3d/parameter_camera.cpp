@@ -76,9 +76,7 @@ bool ParameterCamera::read(std::istream& is) {
 
 bool ParameterCamera::write(std::ostream& os) const {
   if (!internal::writeVector(os, internal::toVectorQT(_offset))) return false;
-  os << _Kcam(0, 0) << " "
-     << _Kcam(1, 1) << " "
-     << _Kcam(0, 2) << " "
+  os << _Kcam(0, 0) << " " << _Kcam(1, 1) << " " << _Kcam(0, 2) << " "
      << _Kcam(1, 2) << " ";
   return !os.fail();
 }

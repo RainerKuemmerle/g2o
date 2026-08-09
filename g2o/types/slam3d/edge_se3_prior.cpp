@@ -63,7 +63,8 @@ bool EdgeSE3Prior::read(std::istream& is) {
 
 bool EdgeSE3Prior::write(std::ostream& os) const {
   if (!writeParamIds(os)) return false;
-  if (!internal::writeVector(os, internal::toVectorQT(measurement()))) return false;
+  if (!internal::writeVector(os, internal::toVectorQT(measurement())))
+    return false;
   return writeInformationMatrix(os);
 }
 
