@@ -28,7 +28,7 @@
 #define G2O_GRAPH_OPTIMIZER_SPARSE_ONLINE_H
 
 #include "g2o/core/sparse_optimizer.h"
-#include "g2o_interactive_api.h"
+#include "g2o/examples/interactive_slam/g2o_interactive/g2o_interactive_api.h"
 
 namespace g2o {
 

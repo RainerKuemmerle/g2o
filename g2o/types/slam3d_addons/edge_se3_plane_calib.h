@@ -38,7 +38,7 @@
 #include "g2o/types/slam3d/vertex_se3.h"
 #include "g2o/types/slam3d_addons/g2o_types_slam3d_addons_api.h"
 #include "g2o/types/slam3d_addons/plane3d.h"
-#include "vertex_plane.h"
+#include "g2o/types/slam3d_addons/vertex_plane.h"
 
 namespace g2o {
 /**
@@ -60,11 +60,10 @@ class G2O_TYPES_SLAM3D_ADDONS_API EdgeSE3PlaneSensorCalib
     Plane3D localPlane = w2n * plane;
     error_ = localPlane.ominus(measurement_);
   }
-
-  void setMeasurement(const Plane3D& m) override { measurement_ = m; }
 };
 
 #ifdef G2O_HAVE_OPENGL
+// LCOV_EXCL_START
 class EdgeSE3PlaneSensorCalibDrawAction : public DrawAction {
  public:
   G2O_TYPES_SLAM3D_ADDONS_API EdgeSE3PlaneSensorCalibDrawAction();
@@ -77,6 +76,7 @@ class EdgeSE3PlaneSensorCalibDrawAction : public DrawAction {
       HyperGraphElementAction::Parameters& params_) override;
   std::shared_ptr<FloatProperty> planeWidth_, planeHeight_;
 };
+// LCOV_EXCL_STOP
 #endif
 
 }  // namespace g2o

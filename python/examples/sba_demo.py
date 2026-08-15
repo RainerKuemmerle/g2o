@@ -52,7 +52,10 @@ def main():
     num_pose = 5
     for i in range(num_pose):
         # pose here transform points from world coordinates to camera coordinates
-        pose = g2o.Isometry3d(np.identity(3), [i * 0.04 - 1, 0, 0])
+        pose = g2o.Isometry3d(
+            np.eye(3, order="F", dtype=np.float64),
+            np.array([i * 0.04 - 1, 0, 0], dtype=np.float64, order="F"),
+        )
         true_poses.append(pose)
 
         v_se3 = g2o.VertexSCam()
@@ -64,7 +67,7 @@ def main():
         optimizer.add_vertex(v_se3)
 
     point_id = num_pose
-    inliers = dict()
+    inliers = {}
     sse = defaultdict(float)
 
     for i, point in enumerate(true_points):
@@ -110,7 +113,7 @@ def main():
 
         if inlier:
             inliers[point_id] = i
-            error = vp.estimate() - true_points[i]
+            error = vp.estimate() - point
             sse[0] += np.sum(error**2)
         point_id += 1
 

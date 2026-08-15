@@ -8,7 +8,7 @@
 
 namespace g2o {
 
-PYBIND11_MODULE(g2opy, m) {
+NB_MODULE(g2opy, m) {
   declareCore(m);
 
   g2o::detail::Registry registry(m);

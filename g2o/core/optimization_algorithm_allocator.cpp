@@ -24,18 +24,18 @@
 // NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 // SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-#include "optimization_algorithm_allocator.h"
+#include "g2o/core/optimization_algorithm_allocator.h"
 
 #include <memory>
 #include <utility>
 
-#include "block_solver.h"  // IWYU pragma: keep
+#include "g2o/core/block_solver.h"  // IWYU pragma: keep
+#include "g2o/core/optimization_algorithm.h"
 #include "g2o/core/optimization_algorithm_dogleg.h"
 #include "g2o/core/optimization_algorithm_gauss_newton.h"
 #include "g2o/core/optimization_algorithm_levenberg.h"
 #include "g2o/core/solver.h"
 #include "g2o/stuff/logger.h"
-#include "optimization_algorithm.h"
 
 namespace g2o {
 

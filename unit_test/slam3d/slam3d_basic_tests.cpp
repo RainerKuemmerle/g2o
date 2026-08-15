@@ -24,9 +24,10 @@
 // NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 // SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-#include <gtest/gtest.h>
-
 #include <tuple>
+
+#include "gtest/gtest.h"
+#include "unit_test/test_helper/typed_basic_tests.h"
 
 #include "g2o/types/slam3d/edge_pointxyz.h"
 #include "g2o/types/slam3d/edge_se3.h"
@@ -39,7 +40,6 @@
 #include "g2o/types/slam3d/edge_xyz_prior.h"
 #include "g2o/types/slam3d/parameter_camera.h"
 #include "g2o/types/slam3d/parameter_se3_offset.h"
-#include "unit_test/test_helper/typed_basic_tests.h"
 
 using Slam3DIoTypes = ::testing::Types<
     // without parameters

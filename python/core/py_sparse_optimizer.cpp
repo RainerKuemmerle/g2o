@@ -1,23 +1,24 @@
 #include "py_sparse_optimizer.h"
 
-#include <g2o/core/estimate_propagator.h>
-#include <g2o/core/hyper_graph_action.h>
-#include <g2o/core/optimization_algorithm.h>
-#include <g2o/core/optimization_algorithm_dogleg.h>
-#include <g2o/core/optimization_algorithm_factory.h>
-#include <g2o/core/optimization_algorithm_gauss_newton.h>
-#include <g2o/core/optimization_algorithm_levenberg.h>
-#include <g2o/core/optimization_algorithm_with_hessian.h>
-#include <g2o/core/sparse_optimizer.h>
-
+#include <sstream>
 #include <utility>
+
+#include "g2o/core/estimate_propagator.h"
+#include "g2o/core/hyper_graph_action.h"
+#include "g2o/core/optimization_algorithm.h"
+#include "g2o/core/optimization_algorithm_dogleg.h"
+#include "g2o/core/optimization_algorithm_factory.h"
+#include "g2o/core/optimization_algorithm_gauss_newton.h"
+#include "g2o/core/optimization_algorithm_levenberg.h"
+#include "g2o/core/optimization_algorithm_with_hessian.h"
+#include "g2o/core/sparse_optimizer.h"
 
 namespace g2o {
 
-void declareSparseOptimizer(py::module& m) {
+void declareSparseOptimizer(py::module_& m) {
   using CLS = SparseOptimizer;
 
-  py::classh<CLS, OptimizableGraph>(m, "SparseOptimizer")
+  py::class_<CLS, OptimizableGraph>(m, "SparseOptimizer")
       // ATTENTION: _solver & _statistics is own by SparseOptimizer and will be
       // deleted in its destructor.
       .def(py::init<>())
@@ -25,15 +26,17 @@ void declareSparseOptimizer(py::module& m) {
       .def("initialize_optimization",
            static_cast<bool (CLS::*)(HyperGraph::EdgeSet&)>(
                &CLS::initializeOptimization),
-           "eset"_a)  // virtual
+           "eset"_a,
+           py::call_guard<py::gil_scoped_release>())  // virtual
       .def("initialize_optimization",
            static_cast<bool (CLS::*)(HyperGraph::VertexSet&, int)>(
                &CLS::initializeOptimization),
-           "vset"_a,
-           "level"_a = 0)  // virtual
+           "vset"_a, "level"_a = 0,
+           py::call_guard<py::gil_scoped_release>())  // virtual
       .def("initialize_optimization",
            static_cast<bool (CLS::*)(int)>(&CLS::initializeOptimization),
-           "level"_a = 0)  // virtual
+           "level"_a = 0,
+           py::call_guard<py::gil_scoped_release>())  // virtual
 
       .def("update_initialization", &CLS::updateInitialization, "vset"_a,
            "eset"_a)  // virtual, ->bool
@@ -81,7 +84,16 @@ void declareSparseOptimizer(py::module& m) {
       .def("gauge_freedom", &CLS::gaugeFreedom)  // -> bool
       .def("active_chi2", &CLS::activeChi2)      // -> double
       .def("active_robust_chi2", &CLS::activeRobustChi2)  // -> double
-      .def("verbose", &CLS::verbose)                      // -> bool
+      .def("num_connected_components", &CLS::numConnectedComponents,
+           "level"_a = 0)
+      .def("is_connected", &CLS::isConnected, "level"_a = 0)
+      .def("print_graph_summary",
+           [](CLS& optimizer) {
+             std::ostringstream os;
+             optimizer.printGraphSummary(os);
+             return os.str();
+           })
+      .def("verbose", &CLS::verbose)  // -> bool
       .def("set_verbose", &CLS::setVerbose,
            "verbose"_a)  // -> void
 
@@ -164,9 +176,9 @@ void declareSparseOptimizer(py::module& m) {
       .def("discard_top", static_cast<void (CLS::*)()>(&CLS::discardTop))
 
       .def("clear", &CLS::clear)  // virtual, -> void
-      .def("compute_active_errors",
-           &CLS::computeActiveErrors)           // virtual, -> void
-      .def("update", &CLS::update, "update"_a)  // -> void
+      .def("compute_active_errors", &CLS::computeActiveErrors,
+           py::call_guard<py::gil_scoped_release>())  // virtual, -> void
+      .def("update", &CLS::update, "update"_a)        // -> void
 
       .def("batch_statistics",
            static_cast<const BatchStatisticsContainer& (CLS::*)() const>(

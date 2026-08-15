@@ -10,18 +10,21 @@ repos:
     -   id: check-added-large-files
 
 # C++
+-   repo: https://github.com/RainerKuemmerle/hdrnorm
+    rev: v0.1.1
+    hooks:
+    -   id: hdrnorm-fix
+        types_or: [c++, c]
 -   repo: https://github.com/pre-commit/mirrors-clang-format
-    rev: v21.1.6
+    rev: v22.1.8
     hooks:
     -   id: clang-format
         types_or: [c++, c, cuda]
 
 # python
--   repo: https://github.com/pycqa/isort
-    rev: 7.0.0
+-   repo: https://github.com/astral-sh/ruff-pre-commit
+    rev: v0.16.0
     hooks:
-      - id: isort
--   repo: https://github.com/psf/black-pre-commit-mirror
-    rev: 25.11.0
-    hooks:
-    -   id: black
+    - id: ruff-check
+      args: [ --fix ]
+    - id: ruff-format

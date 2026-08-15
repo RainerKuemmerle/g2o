@@ -4,6 +4,6 @@
 
 namespace g2o {
 
-void delcareSparseBlockMatrix(py::module& m);
+void delcareSparseBlockMatrix(py::module_& m);
 
 }  // namespace g2o

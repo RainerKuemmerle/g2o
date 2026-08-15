@@ -31,10 +31,10 @@
 #include <memory>
 #include <string>
 
+#include "g2o/core/g2o_core_api.h"
 #include "g2o/core/hyper_graph.h"
+#include "g2o/core/optimizable_graph.h"
 #include "g2o/core/parameter.h"
-#include "g2o_core_api.h"
-#include "optimizable_graph.h"
 
 namespace g2o {
 

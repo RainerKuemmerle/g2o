@@ -27,13 +27,13 @@
 #ifndef G2O_EDGE_XY_PRIOR_H
 #define G2O_EDGE_XY_PRIOR_H
 
-#include <Eigen/Core>
+#include "Eigen/Core"
 
 #include "g2o/core/base_unary_edge.h"
 #include "g2o/core/eigen_types.h"
 #include "g2o/core/optimizable_graph.h"
-#include "g2o_types_slam2d_api.h"
-#include "vertex_point_xy.h"
+#include "g2o/types/slam2d/g2o_types_slam2d_api.h"
+#include "g2o/types/slam2d/vertex_point_xy.h"
 
 namespace g2o {
 
@@ -45,8 +45,6 @@ class G2O_TYPES_SLAM2D_API EdgeXYPrior
   void computeError() override {
     error_ = vertexXnRaw<0>()->estimate() - measurement_;
   }
-
-  void setMeasurement(const Vector2& m) override { measurement_ = m; }
 
   bool setMeasurementFromState() override {
     measurement_ = vertexXnRaw<0>()->estimate();

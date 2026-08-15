@@ -34,12 +34,12 @@
 #define GICP_ANALYTIC_JACOBIANS
 // #define SCAM_ANALYTIC_JACOBIANS
 
-#include <Eigen/Core>
-#include <Eigen/Geometry>
+#include "Eigen/Core"
+#include "Eigen/Geometry"
 
-#include "edge_gicp.h"
 #include "g2o/core/base_binary_edge.h"
-#include "g2o_types_icp_api.h"
+#include "g2o/types/icp/edge_gicp.h"
+#include "g2o/types/icp/g2o_types_icp_api.h"
 
 namespace g2o {
 
@@ -80,7 +80,7 @@ class G2O_TYPES_ICP_API EdgeVVGicp
 class G2O_TYPES_ICP_API VertexSCam : public VertexSE3 {
  public:
   // capture the update function to reset aux transforms
-  void oplusImpl(const VectorX::MapType& update) override;
+  void oplusImpl(const VectorX::MapType& update);
 
   // camera matrix and stereo baseline
   static Matrix3 kcam_;

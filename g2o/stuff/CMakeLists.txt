@@ -46,9 +46,10 @@ install(TARGETS stuff
 add_library(g2o::stuff ALIAS stuff)
 
 # build our OpenGL helper library
-if(OPENGL_FOUND AND G2O_HAVE_OPENGL)
+if(G2O_HAVE_OPENGL)
   add_library(opengl_helper ${G2O_LIB_TYPE}
     opengl_primitives.cpp opengl_primitives.h
+    opengl_interface.cpp
     )
   if (APPLE)
     set_target_properties(opengl_helper PROPERTIES INSTALL_NAME_DIR "${CMAKE_INSTALL_PREFIX}/${CMAKE_INSTALL_LIBDIR}")
@@ -67,7 +68,7 @@ if(OPENGL_FOUND AND G2O_HAVE_OPENGL)
     $<INSTALL_INTERFACE:include/g2o/stuff>
   )
 
-  target_link_libraries(opengl_helper PUBLIC ${G2O_OPENGL_TARGET} Eigen3::Eigen)
+  target_link_libraries(opengl_helper PUBLIC Eigen3::Eigen Qt6::Widgets Qt6::OpenGLWidgets Qt6::Gui)
   target_compile_features(opengl_helper PUBLIC cxx_std_17)
   set_target_properties(opengl_helper PROPERTIES OUTPUT_NAME "${LIB_PREFIX}opengl_helper")
   set_target_properties(opengl_helper PROPERTIES

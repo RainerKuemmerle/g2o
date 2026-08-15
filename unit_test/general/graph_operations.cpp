@@ -24,16 +24,19 @@
 // NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 // SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-#include <gmock/gmock.h>
-#include <gtest/gtest.h>
-
 #include <algorithm>
 #include <cstddef>
 #include <memory>
 #include <numeric>
+#include <sstream>
 #include <unordered_set>
 #include <utility>
 #include <vector>
+
+#include "gmock/gmock.h"
+#include "gtest/gtest.h"
+#include "unit_test/test_helper/allocate_optimizer.h"
+#include "unit_test/test_helper/eigen_matcher.h"
 
 #include "g2o/core/eigen_types.h"
 #include "g2o/core/factory.h"
@@ -51,8 +54,6 @@
 #include "g2o/types/slam3d/edge_se3_pointxyz.h"
 #include "g2o/types/slam3d/vertex_pointxyz.h"
 #include "g2o/types/slam3d/vertex_se3.h"
-#include "unit_test/test_helper/allocate_optimizer.h"
-#include "unit_test/test_helper/eigen_matcher.h"
 
 using g2o::internal::print_wrap;
 using namespace testing;  // NOLINT
@@ -150,6 +151,69 @@ TEST(General, GraphAddEdge) {
   const bool removed = optimizer->removeEdge(e1);
   ASSERT_TRUE(removed);
   ASSERT_TRUE(optimizer->edges().empty());
+}
+
+TEST(General, GraphPrintSummary) {
+  auto optimizer = g2o::internal::createOptimizerForTests();
+
+  auto v0 = std::make_shared<g2o::VertexSE2>();
+  v0->setId(0);
+  auto v1 = std::make_shared<g2o::VertexSE2>();
+  v1->setId(1);
+
+  ASSERT_TRUE(optimizer->addVertex(v0));
+  ASSERT_TRUE(optimizer->addVertex(v1));
+
+  auto e0 = std::make_shared<g2o::EdgeSE2>();
+  e0->setVertex(0, v0);
+  e0->setVertex(1, v1);
+  e0->setLevel(0);
+  ASSERT_TRUE(optimizer->addEdge(e0));
+
+  std::ostringstream os;
+  optimizer->printGraphSummary(os);
+  const std::string summary = os.str();
+
+  EXPECT_NE(summary.find("vertices: 2"), std::string::npos);
+  EXPECT_NE(summary.find("edges: 1"), std::string::npos);
+  EXPECT_NE(summary.find("levels: 1"), std::string::npos);
+  EXPECT_NE(summary.find("connected_components: 1"), std::string::npos);
+}
+
+TEST(General, GraphConnectedComponents) {
+  auto optimizer = g2o::internal::createOptimizerForTests();
+
+  auto v0 = std::make_shared<g2o::VertexSE2>();
+  v0->setId(0);
+  auto v1 = std::make_shared<g2o::VertexSE2>();
+  v1->setId(1);
+  auto v2 = std::make_shared<g2o::VertexSE2>();
+  v2->setId(2);
+
+  ASSERT_TRUE(optimizer->addVertex(v0));
+  ASSERT_TRUE(optimizer->addVertex(v1));
+  ASSERT_TRUE(optimizer->addVertex(v2));
+
+  auto e01 = std::make_shared<g2o::EdgeSE2>();
+  e01->setVertex(0, v0);
+  e01->setVertex(1, v1);
+  e01->setLevel(0);
+  ASSERT_TRUE(optimizer->addEdge(e01));
+
+  auto e12 = std::make_shared<g2o::EdgeSE2>();
+  e12->setVertex(0, v1);
+  e12->setVertex(1, v2);
+  e12->setLevel(1);
+  ASSERT_TRUE(optimizer->addEdge(e12));
+
+  EXPECT_FALSE(optimizer->isConnected(0));
+  EXPECT_EQ(optimizer->numConnectedComponents(0), 2);
+
+  EXPECT_FALSE(optimizer->isConnected(1));
+  EXPECT_EQ(optimizer->numConnectedComponents(1), 2);
+
+  EXPECT_FALSE(optimizer->isConnected(2));
+  EXPECT_EQ(optimizer->numConnectedComponents(2), 3);
 }
 
 TEST(General, GraphIndexMapping) {

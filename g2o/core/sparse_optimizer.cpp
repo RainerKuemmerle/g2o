@@ -24,31 +24,34 @@
 // NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 // SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-#include "sparse_optimizer.h"
+#include "g2o/core/sparse_optimizer.h"
 
-#include <Eigen/Core>
 #include <algorithm>
 #include <cassert>
 #include <cstdlib>
 #include <iostream>
+#include <limits>
 #include <memory>
 #include <string_view>
 #include <unordered_set>
 #include <utility>
 
-#include "batch_stats.h"
-#include "estimate_propagator.h"
+#include "Eigen/Core"
+
 #include "g2o/config.h"  // IWYU pragma: keep
+#include "g2o/core/batch_stats.h"
 #include "g2o/core/eigen_types.h"
+#include "g2o/core/estimate_propagator.h"
+#include "g2o/core/hyper_dijkstra.h"
+#include "g2o/core/hyper_graph_action.h"
 #include "g2o/core/jacobian_workspace.h"  // IWYU pragma: keep
 #include "g2o/core/optimizable_graph.h"
+#include "g2o/core/optimization_algorithm.h"
+#include "g2o/core/robust_kernel.h"  // IWYU pragma: keep
 #include "g2o/core/sparse_block_matrix.h"
 #include "g2o/stuff/logger.h"
 #include "g2o/stuff/macros.h"
 #include "g2o/stuff/timeutil.h"
-#include "hyper_graph_action.h"
-#include "optimization_algorithm.h"
-#include "robust_kernel.h"  // IWYU pragma: keep
 
 #ifndef NDEBUG
 namespace {
@@ -126,6 +129,88 @@ double SparseOptimizer::activeRobustChi2() const {
       chi += e->chi2();
   }
   return chi;
+}
+
+void SparseOptimizer::printGraphSummary(std::ostream& os) const {
+  const size_t nVertices = vertices().size();
+  const size_t nEdges = edges().size();
+  os << "Graph summary:\n";
+  os << "  vertices: " << nVertices << "\n";
+  os << "  edges: " << nEdges << "\n";
+
+  if (nVertices > 0) {
+    const int maxDim = maxDimension();
+    int nPoses = 0;
+    int nLandmarks = 0;
+    std::unordered_set<int> levels;
+    for (const auto& it : vertices()) {
+      auto v = std::static_pointer_cast<OptimizableGraph::Vertex>(it.second);
+      if (v->dimension() == maxDim)
+        nPoses++;
+      else
+        nLandmarks++;
+    }
+    for (const auto& e : edges()) {
+      auto oe = static_cast<OptimizableGraph::Edge*>(e.get());
+      if (oe) {
+        levels.insert(oe->level());
+      }
+    }
+    os << "  poses: " << nPoses << "\n";
+    os << "  landmarks: " << nLandmarks << "\n";
+    os << "  levels: " << levels.size() << "\n";
+  }
+
+  os << "  active vertices: " << activeVertices_.size() << "\n";
+  os << "  active edges: " << activeEdges_.size() << "\n";
+  if (!activeEdges_.empty()) {
+    os << "  active chi2: " << activeChi2() << "\n";
+    os << "  active robust chi2: " << activeRobustChi2() << "\n";
+  }
+  os << "  connected_components: " << numConnectedComponents() << "\n";
+}
+
+int SparseOptimizer::numConnectedComponents(int level) const {
+  if (vertices().empty()) return 0;
+
+  struct LevelCostFunction : public HyperDijkstra::CostFunction {
+    explicit LevelCostFunction(int level_) : level(level_) {}
+    double operator()(HyperGraph::Edge* edge, HyperGraph::Vertex* /*from*/,
+                      HyperGraph::Vertex* /*to*/) override {
+      auto oe = static_cast<OptimizableGraph::Edge*>(edge);
+      if (!oe || oe->level() != level) {
+        return std::numeric_limits<double>::max();
+      }
+      return 1.;
+    }
+    int level;
+  };
+
+  std::shared_ptr<HyperGraph> graph(const_cast<SparseOptimizer*>(this),
+                                    [](HyperGraph*) {});
+  HyperDijkstra d(graph);
+  LevelCostFunction cost(level);
+
+  HyperGraph::VertexSet remaining;
+  for (const auto& it : vertices()) {
+    remaining.insert(it.second);
+  }
+
+  int components = 0;
+  while (!remaining.empty()) {
+    auto root = *remaining.begin();
+    d.shortestPaths(root, cost);
+    const auto& visited = d.visited();
+    for (const auto& v : visited) {
+      remaining.erase(v);
+    }
+    components++;
+  }
+  return components;
+}
+
+bool SparseOptimizer::isConnected(int level) const {
+  return numConnectedComponents(level) <= 1;
 }
 
 std::shared_ptr<OptimizableGraph::Vertex> SparseOptimizer::findGauge() {
@@ -210,9 +295,15 @@ void SparseOptimizer::clearIndexMapping() {
 }
 
 bool SparseOptimizer::initializeOptimization(int level) {
-  HyperGraph::VertexSet vset;
-  for (auto& it : vertices()) vset.insert(it.second);
-  return initializeOptimization(vset, level);
+  HyperGraph::EdgeSet edges_to_optimize;
+  for (const auto& e : edges()) {
+    auto* ee = static_cast<OptimizableGraph::Edge*>(e.get());
+    if (!ee) continue;
+    if (level < 0 || ee->level() == level) {
+      edges_to_optimize.insert(e);
+    }
+  }
+  return initializeOptimization(edges_to_optimize);
 }
 
 bool SparseOptimizer::initializeOptimization(HyperGraph::VertexSet& vset,
@@ -223,9 +314,10 @@ bool SparseOptimizer::initializeOptimization(HyperGraph::VertexSet& vset,
   }
   preIteration(-1);
   bool workspaceAllocated = jacobianWorkspace_.allocate();
-  (void)workspaceAllocated;
-  assert(workspaceAllocated &&
-         "Error while allocating memory for the Jacobians");
+  if (!workspaceAllocated) {
+    G2O_ERROR("Error while allocating memory for the Jacobians");
+    return false;
+  }
   clearIndexMapping();
   auto vertex_id_edge_lookup = createVertexEdgeLookup();
   activeVertices_.clear();
@@ -290,9 +382,10 @@ bool SparseOptimizer::initializeOptimization(HyperGraph::VertexSet& vset,
 bool SparseOptimizer::initializeOptimization(HyperGraph::EdgeSet& eset) {
   preIteration(-1);
   bool workspaceAllocated = jacobianWorkspace_.allocate();
-  (void)workspaceAllocated;
-  assert(workspaceAllocated &&
-         "Error while allocating memory for the Jacobians");
+  if (!workspaceAllocated) {
+    G2O_ERROR("Error while allocating memory for the Jacobians");
+    return false;
+  }
   clearIndexMapping();
   activeVertices_.clear();
   activeEdges_.clear();

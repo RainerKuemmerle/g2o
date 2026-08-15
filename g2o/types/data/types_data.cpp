@@ -29,9 +29,9 @@
 #include "g2o/config.h"
 #include "g2o/core/factory.h"
 #include "g2o/core/hyper_graph_action.h"
-#include "robot_laser.h"
-#include "vertex_ellipse.h"
-#include "vertex_tag.h"
+#include "g2o/types/data/robot_laser.h"
+#include "g2o/types/data/vertex_ellipse.h"
+#include "g2o/types/data/vertex_tag.h"
 
 namespace g2o {
 
@@ -42,9 +42,11 @@ G2O_REGISTER_TYPE_NAME("ROBOTLASER1", RobotLaser);
 G2O_REGISTER_TYPE_NAME("VERTEX_ELLIPSE", VertexEllipse);
 
 #ifdef G2O_HAVE_OPENGL
+// LCOV_EXCL_START
 G2O_REGISTER_ACTION(RobotLaserDrawAction);
 G2O_REGISTER_ACTION(VertexTagDrawAction);
 G2O_REGISTER_ACTION(VertexEllipseDrawAction);
+// LCOV_EXCL_STOP
 #endif
 
 }  // namespace g2o

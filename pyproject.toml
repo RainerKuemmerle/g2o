@@ -1,12 +1,12 @@
 [build-system]
-requires = ["scikit-build-core>=0.10", "pybind11"]
+requires = ["scikit-build-core>=0.10", "nanobind"]
 build-backend = "scikit_build_core.build"
 
 [project]
 name = "g2opy"
-version = "2.2.0"
+version = "2.3.0"
 description="g2o: A General Framework for Graph Optimization"
-readme = "README.md"
+readme = "python/README.md"
 authors = [
   { name = "Rainer Kuemmerle", email = "rainer.kuemmerle@gmail.com" },
 ]

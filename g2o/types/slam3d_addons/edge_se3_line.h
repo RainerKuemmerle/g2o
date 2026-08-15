@@ -34,9 +34,9 @@
 #include "g2o/core/eigen_types.h"
 #include "g2o/core/hyper_graph_action.h"
 #include "g2o/types/slam3d/vertex_se3.h"
-#include "g2o_types_slam3d_addons_api.h"
-#include "line3d.h"
-#include "vertex_line3d.h"
+#include "g2o/types/slam3d_addons/g2o_types_slam3d_addons_api.h"
+#include "g2o/types/slam3d_addons/line3d.h"
+#include "g2o/types/slam3d_addons/vertex_line3d.h"
 
 namespace g2o {
 class CacheSE3Offset;
@@ -44,13 +44,13 @@ class CacheSE3Offset;
 class G2O_TYPES_SLAM3D_ADDONS_API EdgeSE3Line3D
     : public BaseBinaryEdge<4, Line3D, VertexSE3, VertexLine3D> {
  public:
+  using BaseBinaryEdge<4, Line3D, VertexSE3, VertexLine3D>::setMeasurement;
+
   EdgeSE3Line3D();
 
   void computeError() override;
 
   virtual void setMeasurement(const Vector6& m) { measurement_ = Line3D(m); }
-
-  void setMeasurement(const Line3D& m) override { measurement_ = Line3D(m); }
 
   Vector3 color;
 
@@ -60,6 +60,7 @@ class G2O_TYPES_SLAM3D_ADDONS_API EdgeSE3Line3D
 };
 
 #ifdef G2O_HAVE_OPENGL
+// LCOV_EXCL_START
 class G2O_TYPES_SLAM3D_ADDONS_API EdgeSE3Line3DDrawAction : public DrawAction {
  public:
   EdgeSE3Line3DDrawAction();
@@ -71,6 +72,7 @@ class G2O_TYPES_SLAM3D_ADDONS_API EdgeSE3Line3DDrawAction : public DrawAction {
       HyperGraphElementAction::Parameters& params_) override;
   std::shared_ptr<FloatProperty> lineLength_, lineWidth_;
 };
+// LCOV_EXCL_STOP
 #endif
 
 }  // namespace g2o

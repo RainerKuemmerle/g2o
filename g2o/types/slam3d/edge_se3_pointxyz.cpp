@@ -24,23 +24,24 @@
 // NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 // SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-#include "edge_se3_pointxyz.h"
+#include "g2o/types/slam3d/edge_se3_pointxyz.h"
 
 #include "g2o/core/eigen_types.h"
 #include "g2o/core/parameter.h"
+#include "g2o/types/slam3d/parameter_se3_offset.h"
 #include "g2o/types/slam3d/vertex_pointxyz.h"
 #include "g2o/types/slam3d/vertex_se3.h"
-#include "parameter_se3_offset.h"
 
 #ifdef G2O_HAVE_OPENGL
+#include "g2o/stuff/opengl_interface.h"
 #include "g2o/stuff/opengl_primitives.h"
-#include "g2o/stuff/opengl_wrapper.h"
 #endif
 
-#include <Eigen/Geometry>
 #include <cassert>
 #include <string>
 #include <typeinfo>
+
+#include "Eigen/Geometry"
 
 namespace g2o {
 
@@ -129,6 +130,7 @@ void EdgeSE3PointXYZ::initialEstimate(const OptimizableGraph::VertexSet& from,
 }
 
 #ifdef G2O_HAVE_OPENGL
+// LCOV_EXCL_START
 EdgeSE3PointXYZDrawAction::EdgeSE3PointXYZDrawAction()
     : DrawAction(typeid(EdgeSE3PointXYZ).name()) {}
 
@@ -148,20 +150,21 @@ bool EdgeSE3PointXYZDrawAction::operator()(
   ParameterSE3Offset* offsetParam =
       static_cast<ParameterSE3Offset*>(e->parameter(0).get());
   Isometry3 fromTransform = fromEdge->estimate() * offsetParam->param();
-  glColor3f(LANDMARK_EDGE_COLOR);
-  glPushAttrib(GL_ENABLE_BIT);
-  glDisable(GL_LIGHTING);
-  glBegin(GL_LINES);
-  glVertex3f(static_cast<float>(fromTransform.translation().x()),
-             static_cast<float>(fromTransform.translation().y()),
-             static_cast<float>(fromTransform.translation().z()));
-  glVertex3f(static_cast<float>(toEdge->estimate().x()),
-             static_cast<float>(toEdge->estimate().y()),
-             static_cast<float>(toEdge->estimate().z()));
-  glEnd();
-  glPopAttrib();
+  g2o::opengl::color3f(LANDMARK_EDGE_COLOR);
+  g2o::opengl::push_attrib(opengl::Capability::ENABLE_BIT);
+  g2o::opengl::disable(opengl::Capability::LIGHTING);
+  g2o::opengl::begin_lines();
+  g2o::opengl::vertex3f(static_cast<float>(fromTransform.translation().x()),
+                        static_cast<float>(fromTransform.translation().y()),
+                        static_cast<float>(fromTransform.translation().z()));
+  g2o::opengl::vertex3f(static_cast<float>(toEdge->estimate().x()),
+                        static_cast<float>(toEdge->estimate().y()),
+                        static_cast<float>(toEdge->estimate().z()));
+  g2o::opengl::end();
+  g2o::opengl::pop_attrib();
   return true;
 }
+// LCOV_EXCL_STOP
 #endif
 
 }  // namespace g2o

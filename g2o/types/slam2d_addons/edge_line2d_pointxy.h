@@ -29,8 +29,8 @@
 
 #include "g2o/core/base_binary_edge.h"
 #include "g2o/types/slam2d/vertex_point_xy.h"
-#include "g2o_types_slam2d_addons_api.h"
-#include "vertex_line2d.h"
+#include "g2o/types/slam2d_addons/g2o_types_slam2d_addons_api.h"
+#include "g2o/types/slam2d_addons/vertex_line2d.h"
 
 namespace g2o {
 

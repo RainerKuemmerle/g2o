@@ -24,9 +24,8 @@
 // NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 // SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-#include "optimizable_graph.h"
+#include "g2o/core/optimizable_graph.h"
 
-#include <Eigen/Eigenvalues>
 #include <algorithm>
 #include <cassert>
 #include <fstream>
@@ -40,22 +39,24 @@
 #include <utility>
 #include <vector>
 
-#include "cache.h"
-#include "factory.h"
+#include "Eigen/Eigenvalues"
+
 #include "g2o/config.h"  // IWYU pragma: keep
 #include "g2o/core/abstract_graph.h"
+#include "g2o/core/cache.h"
 #include "g2o/core/eigen_types.h"
+#include "g2o/core/factory.h"
 #include "g2o/core/hyper_graph.h"
+#include "g2o/core/hyper_graph_action.h"
 #include "g2o/core/io/io_format.h"
 #include "g2o/core/jacobian_workspace.h"
+#include "g2o/core/optimization_algorithm_property.h"
 #include "g2o/core/parameter.h"
 #include "g2o/core/parameter_container.h"
 #include "g2o/stuff/hash_combine.h"
 #include "g2o/stuff/logger.h"
 #include "g2o/stuff/logger_format.h"  // IWYU pragma: keep
 #include "g2o/stuff/string_tools.h"
-#include "hyper_graph_action.h"
-#include "optimization_algorithm_property.h"
 
 namespace g2o {
 
@@ -153,13 +154,6 @@ VectorX::MapType OptimizableGraph::Vertex::bMap() const {
   return VectorX::MapType(bData(), dim);
 }
 
-void OptimizableGraph::Vertex::updateCache() {
-  if (cacheContainer_) {
-    cacheContainer_->setUpdateNeeded();
-    cacheContainer_->update();
-  }
-}
-
 bool OptimizableGraph::Edge::setParameterId(int argNum, int paramId) {
   if (static_cast<int>(parameters_.size()) <= argNum) return false;
   if (argNum < 0) return false;
@@ -192,6 +186,24 @@ void OptimizableGraph::Edge::setRobustKernel(
 bool OptimizableGraph::Edge::resolveCaches() { return true; }
 
 bool OptimizableGraph::Edge::setMeasurementFromState() { return false; }
+
+void OptimizableGraph::Edge::initialEstimate(
+    const OptimizableGraph::VertexSet& /*from*/,
+    OptimizableGraph::Vertex* /*to*/) {
+  G2O_WARN(
+      "inititialEstimate() is not implemented, please give implementation in "
+      "your derived class");
+}
+
+bool OptimizableGraph::Edge::allVerticesFixed() const {
+  return std::all_of(
+      vertices_.begin(), vertices_.end(),
+      [](const std::shared_ptr<HyperGraph::Vertex>& vertex) {
+        const auto* optimizable_vertex =
+            static_cast<const OptimizableGraph::Vertex*>(vertex.get());
+        return optimizable_vertex && optimizable_vertex->fixed();
+      });
+}
 
 OptimizableGraph::OptimizableGraph()
     : graphActions_(static_cast<int>(ActionType::kAtNumElements)) {}
@@ -455,6 +467,7 @@ bool OptimizableGraph::load(std::istream& is, io::Format format) {
         information(r, c) = abstract_edge.information[idx++];
         if (r != c) information(c, r) = information(r, c);
       }
+    edge->setLevel(abstract_edge.level);
     if (!addEdge(edge)) {
       G2O_ERROR(
           "Failure adding Edge {} IDs {}", abstract_edge.tag,
@@ -728,7 +741,7 @@ bool OptimizableGraph::saveEdge(AbstractGraph& abstract_graph,
     for (int c = r; c < e->dimension(); ++c)
       upper_triangle.push_back(information(r, c));
   abstract_graph.edges().emplace_back(tag, ids, data, upper_triangle,
-                                      e->parameterIds());
+                                      e->parameterIds(), e->level());
   saveUserData(abstract_graph.edges().back(), e->userData());
   return true;
 }

@@ -27,8 +27,9 @@
 #ifndef G2O_VERTEX_LINE3D_H_
 #define G2O_VERTEX_LINE3D_H_
 
-#include <Eigen/Core>
 #include <memory>
+
+#include "Eigen/Core"
 
 #include "g2o/config.h"
 #include "g2o/core/base_vertex.h"
@@ -36,23 +37,23 @@
 #include "g2o/core/hyper_graph.h"
 #include "g2o/core/hyper_graph_action.h"
 #include "g2o/stuff/property.h"
-#include "g2o_types_slam3d_addons_api.h"
-#include "line3d.h"
+#include "g2o/types/slam3d_addons/g2o_types_slam3d_addons_api.h"
+#include "g2o/types/slam3d_addons/line3d.h"
 
 namespace g2o {
 
-class G2O_TYPES_SLAM3D_ADDONS_API VertexLine3D : public BaseVertex<4, Line3D> {
+class G2O_TYPES_SLAM3D_ADDONS_API VertexLine3D
+    : public BaseVertex<VertexLine3D, 4, Line3D> {
  public:
   VertexLine3D();
 
-  void oplusImpl(const VectorX::MapType& update) override {
-    estimate_.oplus(update);
-  }
+  void oplusImpl(const VectorX::MapType& update) { estimate_.oplus(update); }
 
   Vector3 color;
 };
 
 #ifdef G2O_HAVE_OPENGL
+// LCOV_EXCL_START
 class VertexLine3DDrawAction : public DrawAction {
  public:
   VertexLine3DDrawAction();
@@ -64,6 +65,7 @@ class VertexLine3DDrawAction : public DrawAction {
       HyperGraphElementAction::Parameters& params_) override;
   std::shared_ptr<FloatProperty> lineLength_, lineWidth_;
 };
+// LCOV_EXCL_STOP
 #endif
 
 }  // namespace g2o

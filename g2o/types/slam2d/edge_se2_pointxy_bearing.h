@@ -27,8 +27,9 @@
 #ifndef G2O_EDGE_SE2_POINT_XY_BEARING_H
 #define G2O_EDGE_SE2_POINT_XY_BEARING_H
 
-#include <Eigen/Core>
 #include <cmath>
+
+#include "Eigen/Core"
 
 #include "g2o/config.h"
 #include "g2o/core/base_binary_edge.h"
@@ -37,10 +38,10 @@
 #include "g2o/core/hyper_graph_action.h"
 #include "g2o/core/optimizable_graph.h"
 #include "g2o/stuff/misc.h"
-#include "g2o_types_slam2d_api.h"
-#include "se2.h"
-#include "vertex_point_xy.h"
-#include "vertex_se2.h"
+#include "g2o/types/slam2d/g2o_types_slam2d_api.h"
+#include "g2o/types/slam2d/se2.h"
+#include "g2o/types/slam2d/vertex_point_xy.h"
+#include "g2o/types/slam2d/vertex_se2.h"
 
 namespace g2o {
 
@@ -75,12 +76,14 @@ class G2O_TYPES_SLAM2D_API EdgeSE2PointXYBearing
 };
 
 #ifdef G2O_HAVE_OPENGL
+// LCOV_EXCL_START
 class G2O_TYPES_SLAM2D_API EdgeSE2PointXYBearingDrawAction : public DrawAction {
  public:
   EdgeSE2PointXYBearingDrawAction();
   bool operator()(HyperGraph::HyperGraphElement& element,
                   HyperGraphElementAction::Parameters& params_) override;
 };
+// LCOV_EXCL_STOP
 #endif
 
 }  // namespace g2o

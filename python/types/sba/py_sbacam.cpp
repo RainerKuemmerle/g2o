@@ -5,8 +5,8 @@
 
 namespace g2o {
 
-void declareSBACam(py::module& m) {
-  py::classh<SBACam, SE3Quat>(m, "SBACam")
+void declareSBACam(py::module_& m) {
+  py::class_<SBACam, SE3Quat>(m, "SBACam")
       .def(py::init<>())
       .def(py::init<const Eigen::Quaterniond&, const Eigen::Vector3d&>(), "r"_a,
            "t"_a)
@@ -38,20 +38,18 @@ void declareSBACam(py::module& m) {
       .def("set_dr", &SBACam::setDr,
            "sets angle derivatives")  // () -> void
 
-      .def_readwrite("cam", &SBACam::Kcam, "camera matrix")
-      .def_readwrite("Kcam", &SBACam::Kcam, "camera matrix")
-      .def_readwrite("baseline", &SBACam::baseline, "stereo baseline")
+      .def_rw("cam", &SBACam::Kcam, "camera matrix")
+      .def_rw("Kcam", &SBACam::Kcam, "camera matrix")
+      .def_rw("baseline", &SBACam::baseline, "stereo baseline")
 
-      .def_readwrite("w2n", &SBACam::w2n,
-                     "transform from world to node coordinates")
-      .def_readwrite("w2i", &SBACam::w2i,
-                     "transform from world to image coordinates")
+      .def_rw("w2n", &SBACam::w2n, "transform from world to node coordinates")
+      .def_rw("w2i", &SBACam::w2i, "transform from world to image coordinates")
 
       // Derivatives of the rotation matrix transpose wrt quaternion xyz, used
       // for calculating Jacobian wrt pose of a projection.
-      .def_readwrite("dRdx", &SBACam::dRdx)
-      .def_readwrite("dRdy", &SBACam::dRdy)
-      .def_readwrite("dRdz", &SBACam::dRdz);
+      .def_rw("dRdx", &SBACam::dRdx)
+      .def_rw("dRdy", &SBACam::dRdy)
+      .def_rw("dRdz", &SBACam::dRdz);
 }
 
 }  // end namespace g2o

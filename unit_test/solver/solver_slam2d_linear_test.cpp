@@ -2,6 +2,9 @@
 
 #include <memory>
 
+#include "gmock/gmock.h"
+#include "unit_test/test_helper/eigen_matcher.h"
+
 #include "g2o/core/block_solver.h"
 #include "g2o/core/eigen_types.h"
 #include "g2o/core/hyper_graph.h"
@@ -10,8 +13,6 @@
 #include "g2o/types/slam2d/edge_se2.h"
 #include "g2o/types/slam2d/se2.h"
 #include "g2o/types/slam2d/vertex_se2.h"
-#include "gmock/gmock.h"
-#include "unit_test/test_helper/eigen_matcher.h"
 
 using namespace ::testing;  // NOLINT
 

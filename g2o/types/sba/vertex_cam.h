@@ -29,8 +29,8 @@
 
 #include "g2o/core/base_vertex.h"
 #include "g2o/core/eigen_types.h"
-#include "g2o_types_sba_api.h"
-#include "sbacam.h"
+#include "g2o/types/sba/g2o_types_sba_api.h"
+#include "g2o/types/sba/sbacam.h"
 
 namespace g2o {
 
@@ -41,10 +41,10 @@ namespace g2o {
  * qw is assumed to be positive, otherwise there is an ambiguity in qx,qy,qz as
  * a rotation
  */
-class G2O_TYPES_SBA_API VertexCam : public BaseVertex<6, SBACam> {
+class G2O_TYPES_SBA_API VertexCam : public BaseVertex<VertexCam, 6, SBACam> {
  public:
   virtual void setEstimate(const SBACam& cam);
-  void oplusImpl(const VectorX::MapType& update) override;
+  void oplusImpl(const VectorX::MapType& update);
 };
 }  // namespace g2o
 

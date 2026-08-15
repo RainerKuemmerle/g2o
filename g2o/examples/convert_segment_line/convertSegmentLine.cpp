@@ -31,6 +31,7 @@
 #include <string>
 
 #include "CLI/CLI.hpp"
+
 #include "g2o/types/slam2d/edge_se2.h"
 #include "g2o/types/slam2d/edge_se2_pointxy.h"
 #include "g2o/types/slam2d/vertex_point_xy.h"

@@ -31,14 +31,14 @@
 
 #ifdef G2O_HAVE_LOGGING
 // IWYU pragma: begin_exports
-#include <spdlog/fmt/fmt.h>
-#include <spdlog/fmt/ostr.h>
+#include "spdlog/fmt/fmt.h"
+#include "spdlog/fmt/ostr.h"
 // IWYU pragma: end_exports
 
 #if FMT_VERSION >= 90000
 // see https://fmt.dev/9.0.0/api.html#std-ostream-support
 
-#include <Eigen/Core>
+#include "Eigen/Core"
 
 template <typename T>
 struct fmt::formatter<

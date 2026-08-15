@@ -27,8 +27,9 @@
 #ifndef G2O_VERTEX_SEGMENT_2D_H
 #define G2O_VERTEX_SEGMENT_2D_H
 
-#include <Eigen/Core>
 #include <memory>
+
+#include "Eigen/Core"
 
 #include "g2o/config.h"
 #include "g2o/core/base_vertex.h"
@@ -36,12 +37,12 @@
 #include "g2o/core/hyper_graph.h"
 #include "g2o/core/hyper_graph_action.h"
 #include "g2o/stuff/property.h"
-#include "g2o_types_slam2d_addons_api.h"
+#include "g2o/types/slam2d_addons/g2o_types_slam2d_addons_api.h"
 
 namespace g2o {
 
 class G2O_TYPES_SLAM2D_ADDONS_API VertexSegment2D
-    : public BaseVertex<4, Vector4> {
+    : public BaseVertex<VertexSegment2D, 4, Vector4> {
  public:
   VertexSegment2D();
 
@@ -60,12 +61,13 @@ class G2O_TYPES_SLAM2D_ADDONS_API VertexSegment2D
     v = p2;
   }
 
-  void oplusImpl(const VectorX::MapType& update) override {
+  void oplusImpl(const VectorX::MapType& update) {
     estimate_ += update.head<kDimension>();
   }
 };
 
 #ifdef G2O_HAVE_OPENGL
+// LCOV_EXCL_START
 class G2O_TYPES_SLAM2D_ADDONS_API VertexSegment2DDrawAction
     : public DrawAction {
  public:
@@ -78,6 +80,7 @@ class G2O_TYPES_SLAM2D_ADDONS_API VertexSegment2DDrawAction
   DrawAction::Parameters* refreshPropertyPtrs(
       HyperGraphElementAction::Parameters& params_) override;
 };
+// LCOV_EXCL_STOP
 #endif
 
 }  // namespace g2o

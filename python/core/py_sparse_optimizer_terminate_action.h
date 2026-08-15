@@ -1,13 +1,13 @@
 #pragma once
 
-#include <g2o/core/sparse_optimizer_terminate_action.h>
-
 #include "g2opy.h"
+
+#include "g2o/core/sparse_optimizer_terminate_action.h"
 
 namespace g2o {
 
-inline void delcareSparseOptimizerTerminateAction(py::module& m) {
-  py::classh<SparseOptimizerTerminateAction, HyperGraphAction>(
+inline void delcareSparseOptimizerTerminateAction(py::module_& m) {
+  py::class_<SparseOptimizerTerminateAction, HyperGraphAction>(
       m, "SparseOptimizerTerminateAction")
       .def(py::init<>())
       .def("__call__", &SparseOptimizerTerminateAction::operator())

@@ -24,24 +24,24 @@
 // NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 // SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-#include "edge_pointxy.h"
-#include "edge_se2.h"
-#include "edge_se2_lotsofxy.h"
-#include "edge_se2_offset.h"
-#include "edge_se2_pointxy.h"
-#include "edge_se2_pointxy_bearing.h"
-#include "edge_se2_pointxy_calib.h"
-#include "edge_se2_pointxy_offset.h"
-#include "edge_se2_prior.h"
-#include "edge_se2_twopointsxy.h"
-#include "edge_se2_xyprior.h"
-#include "edge_xy_prior.h"
 #include "g2o/config.h"
 #include "g2o/core/factory.h"
 #include "g2o/core/hyper_graph_action.h"
-#include "parameter_se2_offset.h"
-#include "vertex_point_xy.h"
-#include "vertex_se2.h"
+#include "g2o/types/slam2d/edge_pointxy.h"
+#include "g2o/types/slam2d/edge_se2.h"
+#include "g2o/types/slam2d/edge_se2_lotsofxy.h"
+#include "g2o/types/slam2d/edge_se2_offset.h"
+#include "g2o/types/slam2d/edge_se2_pointxy.h"
+#include "g2o/types/slam2d/edge_se2_pointxy_bearing.h"
+#include "g2o/types/slam2d/edge_se2_pointxy_calib.h"
+#include "g2o/types/slam2d/edge_se2_pointxy_offset.h"
+#include "g2o/types/slam2d/edge_se2_prior.h"
+#include "g2o/types/slam2d/edge_se2_twopointsxy.h"
+#include "g2o/types/slam2d/edge_se2_xyprior.h"
+#include "g2o/types/slam2d/edge_xy_prior.h"
+#include "g2o/types/slam2d/parameter_se2_offset.h"
+#include "g2o/types/slam2d/vertex_point_xy.h"
+#include "g2o/types/slam2d/vertex_se2.h"
 
 namespace g2o {
 
@@ -65,11 +65,13 @@ G2O_REGISTER_TYPE_NAME("EDGE_SE2_LOTSOFXY", EdgeSE2LotsOfXY);
 G2O_REGISTER_TYPE_NAME("EDGE_PRIOR_XY", EdgeXYPrior);
 
 #ifdef G2O_HAVE_OPENGL
+// LCOV_EXCL_START
 G2O_REGISTER_ACTION(VertexSE2DrawAction);
 G2O_REGISTER_ACTION(VertexPointXYDrawAction);
 G2O_REGISTER_ACTION(EdgeSE2DrawAction);
 G2O_REGISTER_ACTION(EdgeSE2PointXYDrawAction);
 G2O_REGISTER_ACTION(EdgeSE2PointXYBearingDrawAction);
+// LCOV_EXCL_STOP
 #endif
 
 }  // namespace g2o

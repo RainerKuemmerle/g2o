@@ -27,8 +27,9 @@
 #ifndef G2O_EDGE_SE3_POINT_XYZ_H_
 #define G2O_EDGE_SE3_POINT_XYZ_H_
 
-#include <Eigen/Core>
 #include <memory>
+
+#include "Eigen/Core"
 
 #include "g2o/config.h"
 #include "g2o/core/base_binary_edge.h"
@@ -36,10 +37,10 @@
 #include "g2o/core/hyper_graph.h"
 #include "g2o/core/hyper_graph_action.h"
 #include "g2o/core/optimizable_graph.h"
-#include "g2o_types_slam3d_api.h"
-#include "parameter_se3_offset.h"
-#include "vertex_pointxyz.h"
-#include "vertex_se3.h"
+#include "g2o/types/slam3d/g2o_types_slam3d_api.h"
+#include "g2o/types/slam3d/parameter_se3_offset.h"
+#include "g2o/types/slam3d/vertex_pointxyz.h"
+#include "g2o/types/slam3d/vertex_se3.h"
 
 namespace g2o {
 class CacheSE3Offset;
@@ -58,8 +59,6 @@ class G2O_TYPES_SLAM3D_API EdgeSE3PointXYZ
   // jacobian
   void linearizeOplus() override;
 
-  void setMeasurement(const Vector3& m) override { measurement_ = m; }
-
   bool setMeasurementFromState() override;
 
   double initialEstimatePossible(const OptimizableGraph::VertexSet& from,
@@ -77,12 +76,14 @@ class G2O_TYPES_SLAM3D_API EdgeSE3PointXYZ
 };
 
 #ifdef G2O_HAVE_OPENGL
+// LCOV_EXCL_START
 class EdgeSE3PointXYZDrawAction : public DrawAction {
  public:
   EdgeSE3PointXYZDrawAction();
   bool operator()(HyperGraph::HyperGraphElement& element,
                   HyperGraphElementAction::Parameters& params_) override;
 };
+// LCOV_EXCL_STOP
 #endif
 
 }  // namespace g2o

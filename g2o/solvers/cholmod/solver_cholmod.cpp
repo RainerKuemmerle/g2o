@@ -32,8 +32,8 @@
 #include "g2o/core/optimization_algorithm_allocator.h"
 #include "g2o/core/optimization_algorithm_factory.h"
 #include "g2o/core/optimization_algorithm_property.h"
+#include "g2o/solvers/cholmod/linear_solver_cholmod.h"  // IWYU pragma: keep
 #include "g2o/stuff/logger.h"
-#include "linear_solver_cholmod.h"  // IWYU pragma: keep
 
 // #define ADD_SCALAR_ORDERING
 

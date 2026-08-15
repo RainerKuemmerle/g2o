@@ -35,9 +35,9 @@
 #include "g2o/core/hyper_graph_action.h"
 #include "g2o/core/optimizable_graph.h"
 #include "g2o/stuff/property.h"
-#include "g2o_types_slam2d_api.h"
-#include "se2.h"
-#include "vertex_se2.h"
+#include "g2o/types/slam2d/g2o_types_slam2d_api.h"
+#include "g2o/types/slam2d/se2.h"
+#include "g2o/types/slam2d/vertex_se2.h"
 
 namespace g2o {
 
@@ -82,6 +82,7 @@ class G2O_TYPES_SLAM2D_API EdgeSE2
 };
 
 #ifdef G2O_HAVE_OPENGL
+// LCOV_EXCL_START
 class G2O_TYPES_SLAM2D_API EdgeSE2DrawAction : public DrawAction {
  public:
   EdgeSE2DrawAction();
@@ -93,6 +94,7 @@ class G2O_TYPES_SLAM2D_API EdgeSE2DrawAction : public DrawAction {
       HyperGraphElementAction::Parameters& params_) override;
   std::shared_ptr<FloatProperty> triangleX_, triangleY_;
 };
+// LCOV_EXCL_STOP
 #endif
 
 }  // namespace g2o

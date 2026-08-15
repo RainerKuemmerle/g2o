@@ -32,10 +32,10 @@
 #include "g2o/core/base_binary_edge.h"
 #include "g2o/core/eigen_types.h"
 #include "g2o/core/optimizable_graph.h"
-#include "g2o_types_slam2d_api.h"
-#include "parameter_se2_offset.h"
-#include "vertex_point_xy.h"
-#include "vertex_se2.h"
+#include "g2o/types/slam2d/g2o_types_slam2d_api.h"
+#include "g2o/types/slam2d/parameter_se2_offset.h"
+#include "g2o/types/slam2d/vertex_point_xy.h"
+#include "g2o/types/slam2d/vertex_se2.h"
 
 namespace g2o {
 class CacheSE2Offset;
@@ -51,8 +51,6 @@ class G2O_TYPES_SLAM2D_API EdgeSE2PointXYOffset
 
   void computeError() override;
   void linearizeOplus() override;
-
-  void setMeasurement(const Vector2& m) override { measurement_ = m; }
 
   bool setMeasurementFromState() override;
 

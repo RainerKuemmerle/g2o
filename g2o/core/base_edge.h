@@ -27,14 +27,14 @@
 #ifndef G2O_BASE_EDGE_H
 #define G2O_BASE_EDGE_H
 
-#include <Eigen/Core>
 #include <climits>
 #include <type_traits>
 
+#include "Eigen/Core"
+
 #include "g2o/config.h"  // IWYU pragma: keep
+#include "g2o/core/optimizable_graph.h"
 #include "g2o/core/type_traits.h"
-#include "g2o/stuff/logger.h"
-#include "optimizable_graph.h"
 
 namespace g2o {
 
@@ -95,7 +95,7 @@ class BaseEdge : public OptimizableGraph::Edge {
   using ErrorVector = typename internal::BaseEdgeTraits<D>::ErrorVector;
   using InformationType = typename internal::BaseEdgeTraits<D>::InformationType;
 
-  BaseEdge() : OptimizableGraph::Edge() { dimension_ = D; }
+  BaseEdge() : OptimizableGraph::Edge() { this->dimension_ = D; }
   BaseEdge& operator=(const BaseEdge&) = delete;
   BaseEdge(const BaseEdge&) = delete;
 
@@ -108,13 +108,12 @@ class BaseEdge : public OptimizableGraph::Edge {
   const ErrorVector& error() const { return error_; }
   ErrorVector& error() { return error_; }
 
-  //! information matrix of the constraint
   EIGEN_STRONG_INLINE const InformationType& information() const {
     return information_;
   }
   EIGEN_STRONG_INLINE InformationType& information() { return information_; }
-  template <typename Derived>
-  void setInformation(const Eigen::EigenBase<Derived>& information) {
+  template <typename EigenDerived>
+  void setInformation(const Eigen::EigenBase<EigenDerived>& information) {
     information_ = information;
   }
 
@@ -123,51 +122,26 @@ class BaseEdge : public OptimizableGraph::Edge {
   }
   double* informationData() override { return information_.data(); }
 
-  //! accessor functions for the measurement represented by the edge
   EIGEN_STRONG_INLINE const Measurement& measurement() const {
     return measurement_;
   }
+
   virtual void setMeasurement(const Measurement& m) { measurement_ = m; }
 
-  [[nodiscard]] virtual int rank() const { return dimension(); }
-
-  void initialEstimate(const OptimizableGraph::VertexSet&,
-                       OptimizableGraph::Vertex*) override {
-    G2O_WARN(
-        "inititialEstimate() is not implemented, please give implementation in "
-        "your derived class");
-  }
-
-  /**
-   * set the dimension for a dynamically sizeable error function.
-   * The member will not be declared for edges having a fixed size at compile
-   * time.
-   */
-  template <int Dim = D>
-  std::enable_if_t<Dim == -1, void> setDimension(int dim) {
-    dimension_ = dim;
-    information_.resize(dim, dim);
-    error_.resize(dim, 1);
-  }
-
-  [[nodiscard]] int dimensionAtCompileTime() const final { return kDimension; }
-
-  // methods based on the traits interface
   bool setMeasurementData(const double* d) final {
     if (d == nullptr) return false;
     static_assert(TypeTraits<Measurement>::kVectorDimension != INT_MIN,
                   "Forgot to implement TypeTraits for your Measurement");
     typename TypeTraits<Measurement>::VectorType::ConstMapType aux(
         d, DimensionTraits<Measurement>::dimension(measurement_));
-    setMeasurement(TypeTraits<Measurement>::fromVector(aux));
+    this->setMeasurement(TypeTraits<Measurement>::fromVector(aux));
     return true;
   }
 
   bool getMeasurementData(double* d) const final {
+    if (d == nullptr) return false;
     static_assert(TypeTraits<Measurement>::kVectorDimension != INT_MIN,
                   "Forgot to implement TypeTraits for your Measurement");
-    typename TypeTraits<Measurement>::VectorType::MapType aux(
-        d, DimensionTraits<Measurement>::dimension(measurement_));
     TypeTraits<Measurement>::toData(measurement_, d);
     return true;
   }
@@ -184,33 +158,38 @@ class BaseEdge : public OptimizableGraph::Edge {
     return DimensionTraits<Measurement>::minimalDimension(measurement_);
   }
 
-  //! Return the identity information matrix of this edge type
+  [[nodiscard]] int dimensionAtCompileTime() const final { return kDimension; }
+
   InformationType informationIdentity() const {
     if constexpr (D != Eigen::Dynamic) {
       return InformationType::Identity();
     } else {
-      const int dim_to_use = std::max(0, dimension_);
+      const int dim_to_use = std::max(0, this->dimension_);
       return InformationType::Identity(dim_to_use, dim_to_use);
     }
   }
 
- protected:
-  Measurement measurement_;  ///< the measurement of the edge
-  InformationType information_ =
-      informationIdentity();  ///< information matrix of the edge.
-                              ///< Information = inv(covariance)
-  ErrorVector error_;  ///< error vector, stores the result after computeError()
-                       ///< is called
+  [[nodiscard]] virtual int rank() const { return this->dimension(); }
 
   /**
-   * calculate the robust information matrix by updating the information matrix
-   * of the error
+   * set the dimension for a dynamically sizeable error function.
+   * The member will not be declared for edges having a fixed size at compile
+   * time.
    */
+  template <int Dim = D>
+  std::enable_if_t<Dim == -1, void> setDimension(int dim) {
+    this->dimension_ = dim;
+    information_.resize(dim, dim);
+    error_.resize(dim, 1);
+  }
+
+ protected:
+  Measurement measurement_;
+  InformationType information_ = informationIdentity();
+  ErrorVector error_;
+
   InformationType robustInformation(const Vector3& rho) const {
     InformationType result = rho[1] * information_;
-    // ErrorVector weightedError = information_ * error_;
-    // result.noalias() += 2 * rho[2] * (weightedError *
-    // weightedError.transpose());
     return result;
   }
 };

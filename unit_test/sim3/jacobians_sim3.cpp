@@ -24,12 +24,13 @@
 // NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 // SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-#include "g2o/core/jacobian_workspace.h"
-#include "g2o/core/optimizable_graph.h"
-#include "g2o/types/sim3/types_seven_dof_expmap.h"
 #include "gtest/gtest.h"
 #include "unit_test/test_helper/evaluate_jacobian.h"
 #include "unit_test/test_helper/random_state.h"
+
+#include "g2o/core/jacobian_workspace.h"
+#include "g2o/core/optimizable_graph.h"
+#include "g2o/types/sim3/types_seven_dof_expmap.h"
 
 using namespace std;
 using namespace g2o;

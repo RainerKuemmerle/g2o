@@ -30,7 +30,7 @@
 #include <cstddef>
 #include <memory>
 
-#include "g2o_cholmod_api.h"
+#include "g2o/solvers/cholmod/g2o_cholmod_api.h"
 
 namespace g2o::cholmod {
 

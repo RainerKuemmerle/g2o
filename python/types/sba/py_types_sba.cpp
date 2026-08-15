@@ -1,13 +1,14 @@
 #include "py_types_sba.h"
 
 #include "detail/registry.h"
+#include "g2opy.h"
+
 #include "g2o/core/factory.h"
 #include "g2o/types/sba/edge_project_p2mc.h"
 #include "g2o/types/sba/edge_project_p2sc.h"
 #include "g2o/types/sba/edge_sba_cam.h"
 #include "g2o/types/sba/edge_sba_scale.h"
 #include "g2o/types/sba/vertex_intrinsics.h"
-#include "g2opy.h"
 
 G2O_USE_TYPE_GROUP(sba)
 
@@ -15,10 +16,10 @@ namespace g2o {
 
 namespace {
 void declareVertexIntrinsics(detail::Registry& registry) {
-  py::classh<VertexIntrinsicsEstimate>(registry.mod(),
+  py::class_<VertexIntrinsicsEstimate>(registry.mod(),
                                        "VertexIntrinsicsEstimate")
       .def(py::init<>())
-      .def_readwrite("values", &VertexIntrinsicsEstimate::values);
+      .def_rw("values", &VertexIntrinsicsEstimate::values);
 }
 }  // namespace
 

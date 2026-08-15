@@ -27,13 +27,14 @@
 #ifndef G2O_SPARSE_BLOCK_MATRIX_CCS_H
 #define G2O_SPARSE_BLOCK_MATRIX_CCS_H
 
-#include <Eigen/Core>
 #include <cassert>
 #include <unordered_map>
 #include <vector>
 
+#include "Eigen/Core"
+
 #include "g2o/config.h"  // IWYU pragma: keep // OPENMP
-#include "matrix_operations.h"
+#include "g2o/core/matrix_operations.h"
 
 namespace g2o {
 

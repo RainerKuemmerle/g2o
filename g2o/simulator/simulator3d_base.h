@@ -27,10 +27,10 @@
 #ifndef G2O_SIMULATOR3D_BASE_H_
 #define G2O_SIMULATOR3D_BASE_H_
 
+#include "g2o/simulator/simulator.h"
 #include "g2o/types/slam3d/vertex_pointxyz.h"
 #include "g2o/types/slam3d/vertex_se3.h"
 #include "g2o/types/slam3d_addons/vertex_line3d.h"
-#include "simulator.h"
 
 namespace g2o {
 

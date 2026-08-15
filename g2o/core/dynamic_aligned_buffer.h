@@ -1,7 +1,8 @@
 #pragma once
 
-#include <Eigen/Core>
 #include <cstddef>
+
+#include "Eigen/Core"
 
 namespace g2o {
 // 16 byte aligned allocation functions

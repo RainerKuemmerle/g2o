@@ -31,8 +31,8 @@
 #include <cassert>
 #include <type_traits>
 
-#include "eigen_types.h"
 #include "g2o/autodiff/autodiff.h"
+#include "g2o/core/eigen_types.h"
 #include "g2o/core/type_traits.h"
 
 namespace g2o {
@@ -52,9 +52,9 @@ class EstimateAccessor {
  public:
   //! VertexXnType's EstimateType is a vector type
   template <int K>
-  typename std::enable_if<TypeTraits<typename Edge::template VertexXnType<
-                              K>::EstimateType>::kIsVector != 0,
-                          double*>::type
+  std::enable_if_t<TypeTraits<typename Edge::template VertexXnType<
+                       K>::EstimateType>::kIsVector != 0,
+                   double*>
   data(Edge* that) {
     return const_cast<double*>(that->template vertexXn<K>()->estimate().data());
   }
@@ -64,9 +64,9 @@ class EstimateAccessor {
    * we buffer the estimates into a unordered map.
    */
   template <int K>
-  typename std::enable_if<TypeTraits<typename Edge::template VertexXnType<
-                              K>::EstimateType>::kIsVector == 0,
-                          double*>::type
+  std::enable_if_t<TypeTraits<typename Edge::template VertexXnType<
+                       K>::EstimateType>::kIsVector == 0,
+                   double*>
   data(Edge* that) {
     VectorX& data_buffer = buffer_[K];
     if (data_buffer.size() > 0) {  // trivial caching
@@ -206,6 +206,33 @@ class EstimateAccessorGet {
  * Further documentation on the underlying implementation:
  * Jet: EXTERNAL/ceres/jet.h
  * AutoDiff: EXTERNAL/ceres/autodiff.h
+ *
+ *
+ * ============================================================================
+ * QUICK START GUIDE
+ * ============================================================================
+ *
+ *   struct MyEdge : public BaseEdge<2, Vector2> {  // 2-dim error
+ *     template <typename T>
+ *     bool operator()(const T* v1_est, const T* v2_est, T* error) const {
+ *       // Templated error computation
+ *       error[0] = v1_est[0] * v2_est[0] - v1_est[1];
+ *       error[1] = v2_est[2] + v1_est[2];
+ *       return true;
+ *     }
+ *     G2O_MAKE_AUTO_AD_FUNCTIONS  // Implements computeError() and
+ * linearizeOplus()
+ *   };
+ *
+ * MORE INFORMATION:
+ * See doc/autodiff-guide.md for architecture, math foundations, optimization,
+ * troubleshooting, and detailed comparison.
+ *
+ * MATHEMATICAL FOUNDATION:
+ * Jet<T, N> represents dual numbers: a + v1*e1 + ... + vN*eN
+ *   where e_i^2 = 0 (infinitesimal property)
+ * Derivatives computed via chain rule: f(a + u) = f(a) + f'(a)*u
+ * Arithmetic and math functions are overloaded to propagate derivatives.
  */
 template <typename Edge, typename EstimateAccess = EstimateAccessor<Edge>>
 class AutoDifferentiation {

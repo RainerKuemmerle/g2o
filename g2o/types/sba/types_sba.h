@@ -28,16 +28,16 @@
 #define G2O_SBA_TYPES
 
 // clanf-format off
-#include "g2o_types_sba_api.h"
+#include "g2o/types/sba/g2o_types_sba_api.h"
 // clanf-format on
 
-#include "edge_project_p2mc.h"
-#include "edge_project_p2sc.h"
-#include "edge_sba_cam.h"
-#include "edge_sba_scale.h"
+#include "g2o/types/sba/edge_project_p2mc.h"
+#include "g2o/types/sba/edge_project_p2sc.h"
+#include "g2o/types/sba/edge_sba_cam.h"
+#include "g2o/types/sba/edge_sba_scale.h"
+#include "g2o/types/sba/sbacam.h"
+#include "g2o/types/sba/vertex_cam.h"
+#include "g2o/types/sba/vertex_intrinsics.h"
 #include "g2o/types/slam3d/vertex_pointxyz.h"
-#include "sbacam.h"
-#include "vertex_cam.h"
-#include "vertex_intrinsics.h"
 
 #endif  // SBA_TYPES

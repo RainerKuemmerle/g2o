@@ -27,9 +27,6 @@
 #ifndef G2O_BASE_VERTEX_H
 #define G2O_BASE_VERTEX_H
 
-#include <Eigen/Cholesky>
-#include <Eigen/Core>
-#include <Eigen/Dense>
 #include <cassert>
 #include <climits>
 #include <cmath>
@@ -37,24 +34,19 @@
 #include <stack>
 #include <vector>
 
+#include "Eigen/Cholesky"
+#include "Eigen/Core"
+#include "Eigen/Dense"
+
+#include "g2o/core/cache.h"
 #include "g2o/core/eigen_types.h"
+#include "g2o/core/optimizable_graph.h"
 #include "g2o/core/type_traits.h"
-#include "optimizable_graph.h"
 
 namespace g2o {
 #define G2O_VERTEX_DIM ((D == Eigen::Dynamic) ? dimension_ : D)
 
-/**
- * \brief Templatized BaseVertex
- *
- * Templatized BaseVertex
- *
- * D: minimal dimension of the vertex, e.g., 3 for rotation in 3D. -1 means
- * dynamically assigned at runtime.
- * T: internal type to represent the estimate, e.g., Quaternion for rotation in
- * 3D
- */
-template <int D, typename T>
+template <typename Derived, int D, typename T>
 class BaseVertex : public OptimizableGraph::Vertex {
  public:
   using EstimateType = T;
@@ -68,6 +60,16 @@ class BaseVertex : public OptimizableGraph::Vertex {
       Eigen::Map<MatrixN<D>, MatrixN<D>::Flags & Eigen::PacketAccessBit
                                  ? Eigen::Aligned
                                  : Eigen::Unaligned>;
+
+  void updateCacheImpl() {}
+
+  void updateCache() {
+    if (cacheContainer_) {
+      cacheContainer_->setUpdateNeeded();
+      cacheContainer_->update();
+    }
+    derived().updateCacheImpl();
+  }
 
   BaseVertex();
   BaseVertex& operator=(const BaseVertex&) = delete;
@@ -92,6 +94,11 @@ class BaseVertex : public OptimizableGraph::Vertex {
   void clearQuadraticForm() final { b_.setZero(); }
 
   bool solveDirect(double lambda = 0) override;
+
+  void oplus(const VectorX::MapType& v) final {
+    derived().oplusImpl(v);
+    updateCache();
+  }
 
   //! return right hand side b of the constructed linear system
   BVector& b() { return b_; }
@@ -178,20 +185,32 @@ class BaseVertex : public OptimizableGraph::Vertex {
   }
 
  protected:
+  Derived& derived() { return *static_cast<Derived*>(this); }
+  const Derived& derived() const { return *static_cast<const Derived*>(this); }
+
   HessianBlockType hessian_;
   BVector b_;
   EstimateType estimate_;
   BackupStackType backup_;
 };
 
-template <int D, typename T>
-BaseVertex<D, T>::BaseVertex()
+/**
+ * \brief Templatized BaseVertex
+ *
+ * Derived: concrete vertex type using CRTP dispatch for oplusImpl.
+ * D: minimal dimension of the vertex, e.g., 3 for rotation in 3D. -1 means
+ * dynamically assigned at runtime.
+ * T: internal type to represent the estimate, e.g., Quaternion for rotation in
+ * 3D.
+ */
+template <typename Derived, int D, typename T>
+BaseVertex<Derived, D, T>::BaseVertex()
     : OptimizableGraph::Vertex(), hessian_(nullptr, D, D) {
   dimension_ = D;
 }
 
-template <int D, typename T>
-bool BaseVertex<D, T>::solveDirect(double lambda) {
+template <typename Derived, int D, typename T>
+bool BaseVertex<Derived, D, T>::solveDirect(double lambda) {
   const MatrixN<D> tempA =
       (abs(lambda) < 1e-10)
           ? hessian_
@@ -206,8 +225,8 @@ bool BaseVertex<D, T>::solveDirect(double lambda) {
   return true;
 }
 
-template <int D, typename T>
-void BaseVertex<D, T>::mapHessianMemory(double* d) {
+template <typename Derived, int D, typename T>
+void BaseVertex<Derived, D, T>::mapHessianMemory(double* d) {
   const int vertexDim = G2O_VERTEX_DIM;
   new (&hessian_) HessianBlockType(d, vertexDim, vertexDim);
 }

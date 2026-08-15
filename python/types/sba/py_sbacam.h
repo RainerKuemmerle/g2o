@@ -4,6 +4,6 @@
 
 namespace g2o {
 
-void declareSBACam(py::module& m);
+void declareSBACam(py::module_& m);
 
 }  // end namespace g2o

@@ -26,7 +26,7 @@
 
 #include "g2o/core/base_fixed_sized_edge.h"
 
-#include <gtest/gtest.h>
+#include "gtest/gtest.h"
 
 #include "g2o/core/base_unary_edge.h"
 #include "g2o/core/base_variable_sized_edge.h"
@@ -60,11 +60,12 @@ class Edge3Dynamic : public g2o::BaseVariableSizedEdge<2, g2o::Vector2> {
   }
 };
 
-class VertexNotDefaultCtor : public g2o::BaseVertex<2, g2o::Vector2> {
+class VertexNotDefaultCtor
+    : public g2o::BaseVertex<VertexNotDefaultCtor, 2, g2o::Vector2> {
  public:
   VertexNotDefaultCtor(int x, int y) { estimate_ = g2o::Vector2(x, y); }
 
-  void oplusImpl(const g2o::VectorX::MapType& update) override {
+  void oplusImpl(const g2o::VectorX::MapType& update) {
     estimate_ += update.head<2>();
   }
 };

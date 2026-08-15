@@ -1,24 +1,24 @@
 #include "py_sparse_block_matrix.h"
 
-#include <g2o/core/sparse_block_matrix.h>
-
 #include "g2opy.h"
+
+#include "g2o/core/sparse_block_matrix.h"
 
 namespace g2o {
 
 namespace {
 template <class MatrixType = MatrixX>
-void templatedSparseBlockMatrix(py::module& m, const std::string& suffix) {
+void templatedSparseBlockMatrix(py::module_& m, const std::string& suffix) {
   using CLS = SparseBlockMatrix<MatrixType>;
 
-  py::classh<CLS>(m, ("SparseBlockMatrix" + suffix).c_str())
+  py::class_<CLS>(m, ("SparseBlockMatrix" + suffix).c_str())
       .def(py::init<>())
       .def("clear", &CLS::clear, "dealloc"_a = false)
       .def("cols", &CLS::cols)
       .def("rows", &CLS::rows)
       .def("block",
            static_cast<const MatrixType* (CLS::*)(int, int) const>(&CLS::block),
-           "r"_a, "c"_a, pybind11::return_value_policy::reference_internal)
+           "r"_a, "c"_a, py::rv_policy::reference_internal)
       .def(
           "has_block",
           [](const CLS& sparse_block, int r, int c) {
@@ -36,7 +36,7 @@ void templatedSparseBlockMatrix(py::module& m, const std::string& suffix) {
       .def("block_cols",
            static_cast<const std::vector<typename CLS::IntBlockMap>& (
                CLS::*)(void) const>(&CLS::blockCols),
-           py::return_value_policy::reference_internal)
+           py::rv_policy::reference_internal)
       .def("row_block_indices",
            static_cast<const std::vector<int>& (CLS::*)(void) const>(
                &CLS::rowBlockIndices))
@@ -44,13 +44,11 @@ void templatedSparseBlockMatrix(py::module& m, const std::string& suffix) {
            static_cast<const std::vector<int>& (CLS::*)(void) const>(
                &CLS::colBlockIndices))
       .def("write_octave", &CLS::writeOctave, "filename"_a,
-           "upperTriangle"_a = false)
-      // TODO(goki): Implement the remaining functions of SparseBlockMatrix
-      ;
+           "upperTriangle"_a = false);
 }
 }  // namespace
 
-void delcareSparseBlockMatrix(py::module& m) {
+void delcareSparseBlockMatrix(py::module_& m) {
   templatedSparseBlockMatrix<MatrixX>(m, "X");
 }
 

@@ -24,10 +24,10 @@
 // NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 // SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-#include "parser_interface.h"
+#include "g2o/examples/interactive_slam/slam_parser/interface/parser_interface.h"
 
-#include "slam_context_interface.h"
-#include "slam_parser/parser/driver.h"
+#include "g2o/examples/interactive_slam/slam_parser/interface/slam_context_interface.h"
+#include "g2o/examples/interactive_slam/slam_parser/parser/driver.h"
 
 namespace slam_parser {
 

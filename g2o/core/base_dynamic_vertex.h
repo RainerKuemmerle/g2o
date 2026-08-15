@@ -29,11 +29,11 @@
 
 #include <cassert>
 
-#include "base_vertex.h"
+#include "g2o/core/base_vertex.h"
 
 namespace g2o {
-template <typename T>
-class BaseDynamicVertex : public BaseVertex<-1, T> {
+template <typename Derived, typename T>
+class BaseDynamicVertex : public BaseVertex<Derived, -1, T> {
  public:
   bool setDimension(int newDimension) override;
 
@@ -41,15 +41,15 @@ class BaseDynamicVertex : public BaseVertex<-1, T> {
   // This method is responsible for actually changing the dimension of the state
   virtual bool setDimensionImpl(int newDimension) = 0;
 
-  using BaseVertex<-1, T>::dimension_;
-  using BaseVertex<-1, T>::b_;
-  using BaseVertex<-1, T>::setHessianIndex;
-  using BaseVertex<-1, T>::mapHessianMemory;
-  using BaseVertex<-1, T>::updateCache;
+  using BaseVertex<Derived, -1, T>::dimension_;
+  using BaseVertex<Derived, -1, T>::b_;
+  using BaseVertex<Derived, -1, T>::setHessianIndex;
+  using BaseVertex<Derived, -1, T>::mapHessianMemory;
+  using BaseVertex<Derived, -1, T>::updateCache;
 };
 
-template <typename T>
-bool BaseDynamicVertex<T>::setDimension(int newDimension) {
+template <typename Derived, typename T>
+bool BaseDynamicVertex<Derived, T>::setDimension(int newDimension) {
   // Check the dimension is non-negative.
   assert(newDimension >= 0);
   if (newDimension < 0) return false;

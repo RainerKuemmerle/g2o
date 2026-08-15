@@ -36,7 +36,7 @@
 #include <unordered_set>
 #include <vector>
 
-#include "g2o_cli_api.h"
+#include "g2o/apps/g2o_cli/g2o_cli_api.h"
 
 namespace g2o {
 

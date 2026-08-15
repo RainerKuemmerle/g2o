@@ -24,9 +24,10 @@
 // NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 // SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-#include <gtest/gtest.h>
-
 #include <tuple>
+
+#include "gtest/gtest.h"
+#include "unit_test/test_helper/typed_basic_tests.h"  // IWYU pragma: keep
 
 #include "g2o/types/slam2d/edge_se2.h"
 #include "g2o/types/slam2d/edge_se2_offset.h"
@@ -38,7 +39,6 @@
 #include "g2o/types/slam2d/edge_se2_twopointsxy.h"
 #include "g2o/types/slam2d/edge_xy_prior.h"
 #include "g2o/types/slam2d/parameter_se2_offset.h"
-#include "unit_test/test_helper/typed_basic_tests.h"  // IWYU pragma: keep
 
 using Slam2DIoTypes = ::testing::Types<
     // without parameters

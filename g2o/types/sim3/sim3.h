@@ -27,13 +27,14 @@
 #ifndef G2O_SIM_3
 #define G2O_SIM_3
 
-#include <Eigen/Core>
-#include <Eigen/Geometry>
 #include <iosfwd>
+
+#include "Eigen/Core"
+#include "Eigen/Geometry"
 
 #include "g2o/core/eigen_types.h"
 #include "g2o/core/type_traits.h"
-#include "types_seven_dof_expmap_api.h"
+#include "g2o/types/sim3/types_seven_dof_expmap_api.h"
 
 namespace g2o {
 template <typename T>

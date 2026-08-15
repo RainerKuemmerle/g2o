@@ -27,15 +27,15 @@
 #ifndef G2O_SIX_DOF_TYPES_EXPMAP
 #define G2O_SIX_DOF_TYPES_EXPMAP
 
-#include "edge_project_psi2uv.h"
-#include "edge_project_stereo_xyz.h"
-#include "edge_project_stereo_xyz_onlypose.h"
-#include "edge_project_xyz.h"
-#include "edge_project_xyz2uv.h"
-#include "edge_project_xyz2uvu.h"
-#include "edge_project_xyz_onlypose.h"
-#include "edge_se3_expmap.h"
-#include "parameter_cameraparameters.h"
-#include "vertex_se3_expmap.h"
+#include "g2o/types/sba/edge_project_psi2uv.h"
+#include "g2o/types/sba/edge_project_stereo_xyz.h"
+#include "g2o/types/sba/edge_project_stereo_xyz_onlypose.h"
+#include "g2o/types/sba/edge_project_xyz.h"
+#include "g2o/types/sba/edge_project_xyz2uv.h"
+#include "g2o/types/sba/edge_project_xyz2uvu.h"
+#include "g2o/types/sba/edge_project_xyz_onlypose.h"
+#include "g2o/types/sba/edge_se3_expmap.h"
+#include "g2o/types/sba/parameter_cameraparameters.h"
+#include "g2o/types/sba/vertex_se3_expmap.h"
 
 #endif

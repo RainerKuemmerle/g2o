@@ -1,6 +1,7 @@
 #pragma once
 
 #include "detail/registry.h"
+
 #include "g2o/types/slam3d/vertex_se3.h"
 
 namespace g2o {

@@ -27,9 +27,10 @@
 #include <filesystem>
 #include <regex>
 
+#include "gmock/gmock.h"
+
 #include "g2o/config.h"
 #include "g2o/stuff/filesys_tools.h"
-#include "gmock/gmock.h"
 
 TEST(Stuff, GetFileExtension) {
   EXPECT_EQ("txt", g2o::getFileExtension("test.txt"));

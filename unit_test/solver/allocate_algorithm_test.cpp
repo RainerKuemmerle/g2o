@@ -28,10 +28,11 @@
 #include "g2o/config.h"
 // clang-format on
 
+#include "gmock/gmock.h"
+
 #include "g2o/core/optimization_algorithm.h"
 #include "g2o/core/optimization_algorithm_factory.h"
 #include "g2o/stuff/string_tools.h"
-#include "gmock/gmock.h"
 
 #if defined G2O_HAVE_CHOLMOD
 G2O_USE_OPTIMIZATION_LIBRARY(cholmod);

@@ -24,19 +24,20 @@
 // NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 // SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-#include "parameter_se3_offset.h"
+#include "g2o/types/slam3d/parameter_se3_offset.h"
 
-#include <Eigen/Geometry>
 #include <string>
 #include <typeinfo>
 
+#include "Eigen/Geometry"
+
 #include "g2o/core/eigen_types.h"
 #include "g2o/core/hyper_graph_action.h"
-#include "vertex_se3.h"
+#include "g2o/types/slam3d/vertex_se3.h"
 
 #ifdef G2O_HAVE_OPENGL
+#include "g2o/stuff/opengl_interface.h"
 #include "g2o/stuff/opengl_primitives.h"
-#include "g2o/stuff/opengl_wrapper.h"
 #endif
 
 namespace g2o {
@@ -59,6 +60,7 @@ void CacheSE3Offset::updateImpl() {
 }
 
 #ifdef G2O_HAVE_OPENGL
+// LCOV_EXCL_START
 CacheSE3OffsetDrawAction::CacheSE3OffsetDrawAction()
     : DrawAction(typeid(CacheSE3Offset).name()) {}
 
@@ -82,15 +84,16 @@ bool CacheSE3OffsetDrawAction::operator()(
 
   if (show_ && !show_->value()) return true;
   float cs = cubeSide_ ? cubeSide_->value() : 1.0F;
-  glPushAttrib(GL_COLOR);
-  glColor3f(POSE_PARAMETER_COLOR);
-  glPushMatrix();
-  glMultMatrixd(that->offsetParam()->param().cast<double>().data());
+  g2o::opengl::push_attrib(opengl::Capability::COLOR_BUFFER_BIT);
+  g2o::opengl::color3f(POSE_PARAMETER_COLOR);
+  g2o::opengl::push_matrix();
+  g2o::opengl::mult_matrixd(that->offsetParam()->param().cast<double>().data());
   opengl::drawBox(cs, cs, cs);
-  glPopMatrix();
-  glPopAttrib();
+  g2o::opengl::pop_matrix();
+  g2o::opengl::pop_attrib();
   return true;
 }
+// LCOV_EXCL_STOP
 #endif
 
 }  // namespace g2o

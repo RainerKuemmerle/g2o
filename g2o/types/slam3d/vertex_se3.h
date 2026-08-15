@@ -35,8 +35,8 @@
 #include "g2o/core/hyper_graph.h"
 #include "g2o/core/hyper_graph_action.h"
 #include "g2o/stuff/property.h"
-#include "g2o_types_slam3d_api.h"
-#include "type_traits_isometry3.h"  // IWYU pragma: keep
+#include "g2o/types/slam3d/g2o_types_slam3d_api.h"
+#include "g2o/types/slam3d/type_traits_isometry3.h"  // IWYU pragma: keep
 
 namespace g2o {
 
@@ -52,7 +52,8 @@ namespace g2o {
  * The parameterization for the increments constructed is a 6d vector
  * (x,y,z,qx,qy,qz) (note that we leave out the w part of the quaternion.
  */
-class G2O_TYPES_SLAM3D_API VertexSE3 : public BaseVertex<6, Isometry3> {
+class G2O_TYPES_SLAM3D_API VertexSE3
+    : public BaseVertex<VertexSE3, 6, Isometry3> {
  public:
   VertexSE3();
 
@@ -63,7 +64,7 @@ class G2O_TYPES_SLAM3D_API VertexSE3 : public BaseVertex<6, Isometry3> {
    * element qw of the quaternion is recovred by
    * || (qw,qx,qy,qz) || == 1 => qw = sqrt(1 - || (qx,qy,qz) ||
    */
-  void oplusImpl(const VectorX::MapType& update) override;
+  void oplusImpl(const VectorX::MapType& update);
 
  protected:
   int numOplusCalls_ = 0;  ///< store how often oplus was called to trigger
@@ -71,6 +72,7 @@ class G2O_TYPES_SLAM3D_API VertexSE3 : public BaseVertex<6, Isometry3> {
 };
 
 #ifdef G2O_HAVE_OPENGL
+// LCOV_EXCL_START
 /**
  * \brief visualize the 3D pose vertex
  */
@@ -85,6 +87,7 @@ class G2O_TYPES_SLAM3D_API VertexSE3DrawAction : public DrawAction {
       HyperGraphElementAction::Parameters& params_) override;
   std::shared_ptr<FloatProperty> triangleX_, triangleY_;
 };
+// LCOV_EXCL_STOP
 #endif
 
 }  // namespace g2o

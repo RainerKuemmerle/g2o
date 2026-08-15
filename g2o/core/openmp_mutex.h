@@ -30,7 +30,7 @@
 #include "g2o/config.h"  // IWYU pragma: keep
 
 #ifdef G2O_OPENMP
-#include <omp.h>
+#include "omp.h"
 #else
 #include <cassert>
 #endif

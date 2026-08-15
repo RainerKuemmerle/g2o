@@ -28,7 +28,7 @@
 #include <cmath>
 #include <iostream>
 
-#include "freeglut_minimal.h"
+#include "g2o/EXTERNAL/freeglut/freeglut_minimal.h"
 
 #define freeglut_return_if_fail(expr) \
   if (!(expr)) return;

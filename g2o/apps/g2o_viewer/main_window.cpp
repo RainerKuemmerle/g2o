@@ -16,7 +16,7 @@
 // You should have received a copy of the GNU General Public License
 // along with g2o.  If not, see <http://www.gnu.org/licenses/>.
 
-#include "main_window.h"
+#include "g2o/apps/g2o_viewer/main_window.h"
 
 #include <QComboBox>
 #include <QDoubleValidator>
@@ -29,6 +29,8 @@
 #include <iterator>
 #include <string>
 
+#include "g2o/apps/g2o_viewer/properties_widget.h"
+#include "g2o/apps/g2o_viewer/viewer_properties_widget.h"
 #include "g2o/core/estimate_propagator.h"
 #include "g2o/core/io/io_format.h"
 #include "g2o/core/optimization_algorithm.h"
@@ -40,8 +42,6 @@
 #include "g2o/stuff/filesys_tools.h"
 #include "g2o/stuff/logger.h"
 #include "g2o/stuff/string_tools.h"
-#include "properties_widget.h"
-#include "viewer_properties_widget.h"
 
 namespace {
 QString prepareFilter(const std::vector<g2o::io::FileFilter>& filters) {
@@ -460,11 +460,9 @@ void MainWindow::on_actionSave_Screenshot_triggered(bool) {
 
 void MainWindow::on_actionLoad_Viewer_State_triggered(bool) {
   QString filename = QFileDialog::getOpenFileName(
-      this, "Load State", "camera.xml", "Camera/State file (*.xml)");
+      this, "Load State", "camera.json", "Camera/State file (*.json)");
   if (!filename.isEmpty()) {
-    viewer->setStateFileName(filename);
-    viewer->restoreStateFromFile();
-    viewer->setStateFileName(QString());
+    viewer->restoreStateFromFile(filename);
     viewer->update();
     std::cerr << "Loaded state from " << filename.toStdString() << '\n';
   }
@@ -472,11 +470,9 @@ void MainWindow::on_actionLoad_Viewer_State_triggered(bool) {
 
 void MainWindow::on_actionSave_Viewer_State_triggered(bool) {
   QString filename = QFileDialog::getSaveFileName(
-      this, "Save State", "camera.xml", "Camera/State file (*.xml)");
+      this, "Save State", "camera.json", "Camera/State file (*.json)");
   if (!filename.isEmpty()) {
-    viewer->setStateFileName(filename);
-    viewer->saveStateToFile();
-    viewer->setStateFileName(QString());
+    viewer->saveStateToFile(filename);
     std::cerr << "Saved state to " << filename.toStdString() << '\n';
   }
 }

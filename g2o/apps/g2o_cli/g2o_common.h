@@ -27,7 +27,7 @@
 #ifndef G2O_COMMON_H
 #define G2O_COMMON_H
 
-#include "g2o_cli_api.h"
+#include "g2o/apps/g2o_cli/g2o_cli_api.h"
 
 namespace g2o {
 

@@ -4,6 +4,6 @@
 
 namespace g2o {
 
-void declareOptimizationAlgorithm(py::module& m);
+void declareOptimizationAlgorithm(py::module_& m);
 
 }  // end namespace g2o

@@ -29,8 +29,8 @@
 
 #include <iostream>
 
+#include "g2o/examples/interactive_slam/g2o_interactive/g2o_interactive_api.h"
 #include "g2o/types/slam3d/edge_se3.h"
-#include "g2o_interactive_api.h"
 
 namespace g2o {
 
@@ -38,7 +38,7 @@ class G2O_INTERACTIVE_API OnlineVertexSE3 : public VertexSE3 {
  public:
   OnlineVertexSE3() : updatedEstimate(Eigen::Isometry3d::Identity()) {}
 
-  void oplusImpl(const VectorX::MapType& update) override {
+  void oplusImpl(const VectorX::MapType& update) {
     VertexSE3::oplusImpl(update);
     updatedEstimate = estimate_;
   }

@@ -16,7 +16,7 @@
 // You should have received a copy of the GNU General Public License
 // along with g2o.  If not, see <http://www.gnu.org/licenses/>.
 
-#include "run_g2o_viewer.h"
+#include "g2o/apps/g2o_viewer/run_g2o_viewer.h"
 
 #include <QApplication>
 #include <QThread>
@@ -24,12 +24,13 @@
 #include <memory>
 
 #include "CLI/CLI.hpp"
+
 #include "g2o/apps/g2o_cli/dl_wrapper.h"
 #include "g2o/apps/g2o_cli/g2o_common.h"
+#include "g2o/apps/g2o_viewer/gui_hyper_graph_action.h"
+#include "g2o/apps/g2o_viewer/main_window.h"
+#include "g2o/apps/g2o_viewer/stream_redirect.h"
 #include "g2o/core/sparse_optimizer.h"
-#include "gui_hyper_graph_action.h"
-#include "main_window.h"
-#include "stream_redirect.h"
 
 namespace g2o {
 

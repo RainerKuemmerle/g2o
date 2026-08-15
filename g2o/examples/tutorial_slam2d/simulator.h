@@ -29,8 +29,8 @@
 
 #include <vector>
 
-#include "g2o_tutorial_slam2d_api.h"
-#include "se2.h"
+#include "g2o/examples/tutorial_slam2d/g2o_tutorial_slam2d_api.h"
+#include "g2o/examples/tutorial_slam2d/se2.h"
 
 namespace g2o::tutorial {
 

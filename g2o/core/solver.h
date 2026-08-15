@@ -33,9 +33,9 @@
 #include <vector>
 
 #include "g2o/core/eigen_types.h"
-#include "g2o_core_api.h"
-#include "hyper_graph.h"
-#include "sparse_block_matrix.h"
+#include "g2o/core/g2o_core_api.h"
+#include "g2o/core/hyper_graph.h"
+#include "g2o/core/sparse_block_matrix.h"
 
 namespace g2o {
 

@@ -19,11 +19,12 @@
 #include <iostream>
 
 #include "CLI/CLI.hpp"
+
+#include "g2o/examples/interactive_slam/g2o_incremental/graph_optimizer_sparse_incremental.h"
 #include "g2o/examples/interactive_slam/g2o_interactive/g2o_slam_interface.h"
+#include "g2o/examples/interactive_slam/slam_parser/interface/parser_interface.h"
 #include "g2o/stuff/string_tools.h"
 #include "g2o/stuff/tictoc.h"
-#include "graph_optimizer_sparse_incremental.h"
-#include "slam_parser/interface/parser_interface.h"
 
 namespace {
 

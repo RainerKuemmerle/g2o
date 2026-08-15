@@ -24,7 +24,7 @@
 // NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 // SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-#include "vertex_tag.h"
+#include "g2o/types/data/vertex_tag.h"
 
 #include <iomanip>  // IWYU pragma: keep
 #include <ostream>
@@ -35,8 +35,8 @@
 
 #ifdef G2O_HAVE_OPENGL
 #include "g2o/EXTERNAL/freeglut/freeglut_minimal.h"
+#include "g2o/stuff/opengl_interface.h"
 #include "g2o/stuff/opengl_primitives.h"
-#include "g2o/stuff/opengl_wrapper.h"
 #endif
 
 namespace g2o {
@@ -62,6 +62,7 @@ bool VertexTag::write(std::ostream& os) const {
 }
 
 #ifdef G2O_HAVE_OPENGL
+// LCOV_EXCL_START
 VertexTagDrawAction::VertexTagDrawAction()
     : DrawAction(typeid(VertexTag).name()), textSize_(nullptr) {}
 
@@ -86,20 +87,21 @@ bool VertexTagDrawAction::operator()(
   }
   auto* that = static_cast<VertexTag*>(&element);
 
-  glPushMatrix();
-  glColor3f(1.F, 0.2F, 1.F);
-  glTranslatef(that->position().x(), that->position().y(),
-               that->position().z());
+  opengl::push_matrix();
+  opengl::color3f(1.F, 0.2F, 1.F);
+  opengl::translatef(that->position().x(), that->position().y(),
+                     that->position().z());
   float textSize = 1;
   if (textSize_) textSize = static_cast<float>(textSize_->value());
   opengl::drawBox(0.1F * textSize, 0.1F * textSize, 0.1F * textSize);
-  glTranslatef(0.2F * textSize, 0.F, 0.F);
-  glScalef(0.003F * textSize, 0.003F * textSize, 1.F);
+  opengl::translatef(0.2F * textSize, 0.F, 0.F);
+  opengl::scalef(0.003F * textSize, 0.003F * textSize, 1.F);
   freeglut_minimal::glutStrokeString(freeglut_minimal::kGlutStrokeRoman,
                                      that->name().c_str());
-  glPopMatrix();
+  opengl::pop_matrix();
   return true;
 }
+// LCOV_EXCL_STOP
 #endif
 
 }  // namespace g2o

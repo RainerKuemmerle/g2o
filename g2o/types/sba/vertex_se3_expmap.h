@@ -29,8 +29,8 @@
 
 #include "g2o/core/base_vertex.h"
 #include "g2o/core/eigen_types.h"
+#include "g2o/types/sba/g2o_types_sba_api.h"
 #include "g2o/types/slam3d/se3quat.h"
-#include "g2o_types_sba_api.h"
 
 namespace g2o {
 
@@ -38,9 +38,10 @@ namespace g2o {
  * \brief SE3 Vertex parameterized internally with a transformation matrix
  * and externally with its exponential map
  */
-class G2O_TYPES_SBA_API VertexSE3Expmap : public BaseVertex<6, SE3Quat> {
+class G2O_TYPES_SBA_API VertexSE3Expmap
+    : public BaseVertex<VertexSE3Expmap, 6, SE3Quat> {
  public:
-  void oplusImpl(const VectorX::MapType& update) override;
+  void oplusImpl(const VectorX::MapType& update);
 };
 
 }  // namespace g2o

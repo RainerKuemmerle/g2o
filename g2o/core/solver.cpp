@@ -24,11 +24,11 @@
 // NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 // SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-#include "solver.h"
+#include "g2o/core/solver.h"
 
 #include <cstring>
 
-#include "dynamic_aligned_buffer.h"
+#include "g2o/core/dynamic_aligned_buffer.h"
 
 namespace g2o {
 

@@ -16,7 +16,7 @@
 // You should have received a copy of the GNU General Public License
 // along with g2o.  If not, see <http://www.gnu.org/licenses/>.
 
-#include "main_window.h"
+#include "g2o/examples/slam2d/main_window.h"
 
 #include <QFileDialog>
 #include <fstream>

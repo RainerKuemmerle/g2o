@@ -24,9 +24,9 @@
 #ifndef NCOMPLEX
 #define NCOMPLEX
 #endif
-#include <cs.h>  // IWYU pragma: export
+#include "cs.h"  // IWYU pragma: export
 
-#include "g2o_csparse_extension_api.h"
+#include "g2o/solvers/csparse/g2o_csparse_extension_api.h"
 
 namespace g2o::csparse_extension {
 

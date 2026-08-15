@@ -24,10 +24,11 @@
 // NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 // SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-#include <Eigen/Core>
 #include <iostream>
 
 #include "CLI/CLI.hpp"
+#include "Eigen/Core"
+
 #include "g2o/core/auto_differentiation.h"
 #include "g2o/core/base_unary_edge.h"
 #include "g2o/core/base_vertex.h"
@@ -40,9 +41,9 @@ G2O_USE_OPTIMIZATION_LIBRARY(dense);
 /**
  * \brief the params, a, b, and lambda for a * exp(-lambda * t) + b
  */
-class VertexParams : public g2o::BaseVertex<3, Eigen::Vector3d> {
+class VertexParams : public g2o::BaseVertex<VertexParams, 3, Eigen::Vector3d> {
  public:
-  void oplusImpl(const g2o::VectorX::MapType& update) override {
+  void oplusImpl(const g2o::VectorX::MapType& update) {
     estimate_ += update.head<kDimension>();
   }
 };

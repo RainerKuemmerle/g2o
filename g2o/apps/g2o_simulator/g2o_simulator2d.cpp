@@ -29,6 +29,7 @@
 #include <iostream>
 
 #include "CLI/CLI.hpp"
+
 #include "g2o/core/optimizable_graph.h"
 #include "g2o/simulator/simulator.h"
 #include "g2o/simulator/simulator2d_base.h"

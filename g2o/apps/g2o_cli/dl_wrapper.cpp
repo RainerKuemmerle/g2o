@@ -24,17 +24,17 @@
 // NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 // SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-#include "dl_wrapper.h"
-
-#include <sys/types.h>
+#include "g2o/apps/g2o_cli/dl_wrapper.h"
 
 #include <regex>
+
+#include "sys/types.h"
 
 #include "g2o/stuff/filesys_tools.h"
 #include "g2o/stuff/logger.h"
 
 #if defined(UNIX) || defined(CYGWIN)
-#include <dlfcn.h>
+#include "dlfcn.h"
 #endif
 
 namespace g2o {

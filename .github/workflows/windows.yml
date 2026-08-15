@@ -22,14 +22,14 @@ jobs:
       matrix:
         config:
         - {
-            name: "Windows 2022 MSVC",
-            os: windows-2022,
+            name: "Windows Latest MSVC",
+            os: windows-latest,
             build_type: "Debug",
             generators: "Ninja"
           }
 
     steps:
-      - uses: actions/checkout@v5
+      - uses: actions/checkout@v7
         with:
             fetch-depth: 25
 

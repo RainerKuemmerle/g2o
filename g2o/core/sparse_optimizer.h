@@ -28,16 +28,17 @@
 #define G2O_GRAPH_OPTIMIZER_CHOL_H_
 
 #include <memory>
+#include <ostream>
 #include <utility>
 #include <vector>
 
-#include "batch_stats.h"
+#include "g2o/core/batch_stats.h"
 #include "g2o/core/eigen_types.h"
+#include "g2o/core/g2o_core_api.h"
 #include "g2o/core/hyper_graph.h"
+#include "g2o/core/optimizable_graph.h"
+#include "g2o/core/sparse_block_matrix.h"
 #include "g2o/stuff/macros.h"
-#include "g2o_core_api.h"
-#include "optimizable_graph.h"
-#include "sparse_block_matrix.h"
 
 namespace g2o {
 
@@ -170,6 +171,23 @@ class G2O_CORE_API SparseOptimizer : public OptimizableGraph {
    * of the error according to the robustification of the error functions.
    */
   double activeRobustChi2() const;
+
+  /**
+   * Print a short summary of the currently loaded graph.
+   */
+  void printGraphSummary(std::ostream& os = std::cout) const;
+
+  /**
+   * Returns the number of connected components in the graph.
+   * Only edges with the specified level are considered.
+   */
+  int numConnectedComponents(int level = 0) const;
+
+  /**
+   * Returns true if the graph is fully connected.
+   * Only edges with the specified level are considered.
+   */
+  bool isConnected(int level = 0) const;
 
   //! verbose information during optimization
   bool verbose() const { return verbose_; }

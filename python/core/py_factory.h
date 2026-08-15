@@ -4,6 +4,6 @@
 
 namespace g2o {
 
-void declareFactory(py::module& m);
+void declareFactory(py::module_& m);
 
 }  // end namespace g2o

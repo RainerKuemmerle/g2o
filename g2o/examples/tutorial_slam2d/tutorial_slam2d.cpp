@@ -26,16 +26,16 @@
 
 #include <iostream>
 
-#include "edge_se2.h"
-#include "edge_se2_pointxy.h"
 #include "g2o/core/block_solver.h"
 #include "g2o/core/optimization_algorithm_factory.h"
 #include "g2o/core/optimization_algorithm_gauss_newton.h"
 #include "g2o/core/sparse_optimizer.h"
+#include "g2o/examples/tutorial_slam2d/edge_se2.h"
+#include "g2o/examples/tutorial_slam2d/edge_se2_pointxy.h"
+#include "g2o/examples/tutorial_slam2d/simulator.h"
+#include "g2o/examples/tutorial_slam2d/vertex_point_xy.h"
+#include "g2o/examples/tutorial_slam2d/vertex_se2.h"
 #include "g2o/solvers/eigen/linear_solver_eigen.h"
-#include "simulator.h"
-#include "vertex_point_xy.h"
-#include "vertex_se2.h"
 
 using std::cerr;
 

@@ -28,7 +28,7 @@
 #define G2O_CORE_IO_JSON_FORMAT_H
 
 #include "g2o/core/g2o_core_api.h"
-#include "io_interface.h"
+#include "g2o/core/io/io_interface.h"
 
 namespace g2o {
 

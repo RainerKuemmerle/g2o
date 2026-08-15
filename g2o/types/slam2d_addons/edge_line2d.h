@@ -31,18 +31,18 @@
 #include "g2o/core/eigen_types.h"
 #include "g2o/types/slam2d_addons/g2o_types_slam2d_addons_api.h"
 #include "g2o/types/slam2d_addons/line_2d.h"
-#include "vertex_line2d.h"
+#include "g2o/types/slam2d_addons/vertex_line2d.h"
 
 namespace g2o {
 
 class G2O_TYPES_SLAM2D_ADDONS_API EdgeLine2D
     : public BaseBinaryEdge<2, Line2D, VertexLine2D, VertexLine2D> {
  public:
+  using BaseBinaryEdge<2, Line2D, VertexLine2D, VertexLine2D>::setMeasurement;
+
   EdgeLine2D();
 
   void computeError() override;
-
-  void setMeasurement(const Line2D& m) override { measurement_ = m; }
 
   virtual void setMeasurement(const Vector2& m) { measurement_ = Line2D(m); }
 

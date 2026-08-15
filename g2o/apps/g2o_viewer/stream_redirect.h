@@ -32,7 +32,7 @@
 #include <streambuf>
 #include <string>
 
-#include "g2o_viewer_api.h"
+#include "g2o/apps/g2o_viewer/g2o_viewer_api.h"
 
 class QPlainTextEdit;
 

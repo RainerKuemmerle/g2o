@@ -1,19 +1,11 @@
-# Qt5 was been find_package'd() by FindQGLViewer.cmake
-if(Qt5_FOUND)
-  QT5_WRAP_UI(UI_HEADERS base_main_window.ui base_properties_widget.ui)
-  QT5_WRAP_CPP(UI_SOURCES main_window.h abstract_properties_widget.h)
-
-  include_directories(${Qt5Core_INCLUDE_DIRS} ${Qt5Xml_INCLUDE_DIRS} ${Qt5Gui_INCLUDE_DIRS} ${Qt5Widgets_INCLUDE_DIRS} ${Qt5OpenGL_INCLUDE_DIRS})
-  string(APPEND qt5_includes_dirs "${Qt5Core_INCLUDE_DIRS} ${Qt5Xml_INCLUDE_DIRS} ${Qt5Gui_INCLUDE_DIRS} ${Qt5Widgets_INCLUDE_DIRS} ${Qt5OpenGL_INCLUDE_DIRS}")
-  set(MY_QT_LIBRARIES ${Qt5Widgets_LIBRARIES} ${Qt5Core_LIBRARIES} ${Qt5Gui_LIBRARIES} ${Qt5Xml_LIBRARIES} ${Qt5OpenGL_LIBRARIES})
-endif()
-
-include_directories(SYSTEM ${QGLVIEWER_INCLUDE_DIR})
-include_directories(${CMAKE_CURRENT_SOURCE_DIR} ${CMAKE_CURRENT_BINARY_DIR})
+# Use CMake automoc/autouic so moc/uic are generated with the configured Qt
+set(CMAKE_AUTOMOC ON)
+set(CMAKE_AUTOUIC ON)
 
 add_library(viewer_library ${G2O_LIB_TYPE}
   g2o_viewer_api.h
   g2o_qglviewer.cpp g2o_qglviewer.h
+  qglviewer_shim.cpp qglviewer_shim.h
   main_window.cpp main_window.h
   stream_redirect.cpp stream_redirect.h
   gui_hyper_graph_action.cpp gui_hyper_graph_action.h
@@ -22,6 +14,10 @@ add_library(viewer_library ${G2O_LIB_TYPE}
   viewer_properties_widget.cpp viewer_properties_widget.h
   run_g2o_viewer.cpp run_g2o_viewer.h
   ${UI_HEADERS} ${UI_SOURCES}
+)
+target_include_directories(viewer_library PRIVATE
+  ${CMAKE_CURRENT_SOURCE_DIR}
+  ${CMAKE_CURRENT_BINARY_DIR}
 )
 set_target_properties(viewer_library PROPERTIES OUTPUT_NAME ${LIB_PREFIX}viewer)
 set_target_properties(viewer_library PROPERTIES
@@ -37,9 +33,12 @@ add_executable(g2o_viewer
 
 set_target_properties(g2o_viewer PROPERTIES OUTPUT_NAME g2o_viewer)
 
-target_link_libraries(viewer_library PUBLIC core g2o_cli_library ${QGLVIEWER_LIBRARY} ${MY_QT_LIBRARIES} ${OPENGL_LIBRARY})
+find_package(Qt6 COMPONENTS Widgets OpenGLWidgets REQUIRED)
+target_link_libraries(viewer_library PUBLIC core g2o_cli_library Qt6::Widgets Qt6::OpenGLWidgets)
 target_link_libraries(viewer_library PUBLIC opengl_helper)
 target_link_libraries(viewer_library PRIVATE CLI11::CLI11)
+# No direct GLU dependency: g2o provides local GLU-like helpers in the
+# `opengl_helper` library (glu_perspective / glu_look_at).
 target_link_libraries(g2o_viewer viewer_library)
 
 install(TARGETS viewer_library
@@ -47,7 +46,7 @@ install(TARGETS viewer_library
   RUNTIME DESTINATION ${RUNTIME_DESTINATION}
   LIBRARY DESTINATION ${LIBRARY_DESTINATION}
   ARCHIVE DESTINATION ${ARCHIVE_DESTINATION}
-  INCLUDES DESTINATION ${INCLUDES_DESTINATION} ${qt5_includes_dirs} ${QGLVIEWER_INCLUDE_DIR}
+  INCLUDES DESTINATION ${INCLUDES_DESTINATION}
 )
 install(TARGETS g2o_viewer
   RUNTIME DESTINATION ${RUNTIME_DESTINATION}

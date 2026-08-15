@@ -24,22 +24,22 @@
 // NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 // SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-#include "parameter_camera.h"
+#include "g2o/types/slam3d/parameter_camera.h"
 
-#include <Eigen/src/Geometry/Transform.h>
-
-#include <Eigen/Core>
-#include <Eigen/Geometry>
-#include <Eigen/LU>
 #include <string>
 #include <typeinfo>
+
+#include "Eigen/Core"
+#include "Eigen/Geometry"
+#include "Eigen/LU"
+#include "Eigen/src/Geometry/Transform.h"
 
 #include "g2o/core/hyper_graph_action.h"
 #include "g2o/types/slam3d/vertex_se3.h"
 
 #ifdef G2O_HAVE_OPENGL
+#include "g2o/stuff/opengl_interface.h"
 #include "g2o/stuff/opengl_primitives.h"
-#include "g2o/stuff/opengl_wrapper.h"
 #endif
 
 namespace g2o {
@@ -63,6 +63,7 @@ void CacheCamera::updateImpl() {
 }
 
 #ifdef G2O_HAVE_OPENGL
+// LCOV_EXCL_START
 CacheCameraDrawAction::CacheCameraDrawAction()
     : DrawAction(typeid(CacheCamera).name()) {}
 
@@ -90,16 +91,17 @@ bool CacheCameraDrawAction::operator()(
 
   auto* offsetParam =
       static_cast<ParameterCamera*>(that->parameters()[0].get());
-  glPushAttrib(GL_COLOR);
-  glColor3f(POSE_PARAMETER_COLOR);
-  glPushMatrix();
-  glMultMatrixd(offsetParam->param().offset().data());
-  glRotatef(180.0F, 0.0F, 1.0F, 0.0F);
+  g2o::opengl::push_attrib(opengl::Capability::COLOR_BUFFER_BIT);
+  g2o::opengl::color3f(POSE_PARAMETER_COLOR);
+  g2o::opengl::push_matrix();
+  g2o::opengl::mult_matrixd(offsetParam->param().offset().data());
+  g2o::opengl::rotatef(180.0F, 0.0F, 1.0F, 0.0F);
   opengl::drawPyramid(cameraSide_->value(), cameraZ_->value());
-  glPopMatrix();
-  glPopAttrib();
+  g2o::opengl::pop_matrix();
+  g2o::opengl::pop_attrib();
   return true;
 }
+// LCOV_EXCL_STOP
 #endif
 
 }  // namespace g2o

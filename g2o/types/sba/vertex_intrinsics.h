@@ -27,11 +27,11 @@
 #ifndef G2O_SBA_VERTEX_INTRINSICS_H
 #define G2O_SBA_VERTEX_INTRINSICS_H
 
-#include <Eigen/Core>
+#include "Eigen/Core"
 
 #include "g2o/core/base_vertex.h"
 #include "g2o/core/eigen_types.h"
-#include "g2o_types_sba_api.h"
+#include "g2o/types/sba/g2o_types_sba_api.h"
 
 namespace g2o {
 template <typename T>
@@ -45,11 +45,11 @@ struct VertexIntrinsicsEstimate {
  * \brief Vertex encoding the intrinsics of the camera fx, fy, cx, xy, baseline;
  */
 class G2O_TYPES_SBA_API VertexIntrinsics
-    : public BaseVertex<4, VertexIntrinsicsEstimate> {
+    : public BaseVertex<VertexIntrinsics, 4, VertexIntrinsicsEstimate> {
  public:
   VertexIntrinsics();
 
-  void oplusImpl(const VectorX::MapType& update) override;
+  void oplusImpl(const VectorX::MapType& update);
 };
 
 template <>

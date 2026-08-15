@@ -28,9 +28,10 @@
 #include <cstdlib>
 
 #include "CLI/CLI.hpp"
-#include "g2o_slam_interface.h"
-#include "graph_optimizer_sparse_online.h"
-#include "slam_parser/interface/parser_interface.h"
+
+#include "g2o/examples/interactive_slam/g2o_interactive/g2o_slam_interface.h"
+#include "g2o/examples/interactive_slam/g2o_interactive/graph_optimizer_sparse_online.h"
+#include "g2o/examples/interactive_slam/slam_parser/interface/parser_interface.h"
 
 int main(int argc, char** argv) {
   bool pcg;

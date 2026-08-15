@@ -2,7 +2,8 @@
 #define G2O_CONTINUOUS_TO_DISCRETE_H_
 
 #include <iostream>
-#include <unsupported/Eigen/MatrixFunctions>
+
+#include "unsupported/Eigen/MatrixFunctions"
 
 // Form for fixed-size matrices
 template <typename MatrixType>

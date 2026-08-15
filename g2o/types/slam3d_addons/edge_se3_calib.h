@@ -31,7 +31,7 @@
 #include "g2o/core/eigen_types.h"
 #include "g2o/types/slam3d/type_traits_isometry3.h"  // IWYU pragma: keep
 #include "g2o/types/slam3d/vertex_se3.h"
-#include "g2o_types_slam3d_addons_api.h"
+#include "g2o/types/slam3d_addons/g2o_types_slam3d_addons_api.h"
 
 namespace g2o {
 /**

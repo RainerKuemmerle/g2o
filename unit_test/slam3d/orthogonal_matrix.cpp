@@ -24,8 +24,9 @@
 // NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 // SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-#include "g2o/types/slam3d/isometry3d_mappings.h"
 #include "gtest/gtest.h"
+
+#include "g2o/types/slam3d/isometry3d_mappings.h"
 
 using namespace std;
 

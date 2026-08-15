@@ -24,13 +24,14 @@
 // NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 // SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-#include "solver_slam2d_linear.h"
+#include "g2o/solvers/slam2d_linear/solver_slam2d_linear.h"
 
-#include <Eigen/Core>
 #include <cassert>
 #include <cstddef>
 #include <utility>
 #include <vector>
+
+#include "Eigen/Core"
 
 #include "g2o/core/eigen_types.h"
 #include "g2o/core/hyper_dijkstra.h"

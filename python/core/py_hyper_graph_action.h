@@ -1,12 +1,13 @@
 #pragma once
 
-#include "g2o/core/hyper_graph_action.h"
 #include "g2opy.h"
+
+#include "g2o/core/hyper_graph_action.h"
 
 namespace g2o {
 
-inline void delcareHyperGraphAction(py::module& m) {
-  py::classh<HyperGraphAction>(m, "HyperGraphAction");
+inline void delcareHyperGraphAction(py::module_& m) {
+  py::class_<HyperGraphAction>(m, "HyperGraphAction");
 
   // class G2O_CORE_API HyperGraphElementAction{
   // class G2O_CORE_API HyperGraphElementActionCollection: public

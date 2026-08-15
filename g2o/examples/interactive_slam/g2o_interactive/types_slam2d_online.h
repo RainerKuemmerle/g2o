@@ -29,8 +29,8 @@
 
 #include <iostream>
 
+#include "g2o/examples/interactive_slam/g2o_interactive/g2o_interactive_api.h"
 #include "g2o/types/slam2d/edge_se2.h"
-#include "g2o_interactive_api.h"
 
 namespace g2o {
 
@@ -38,7 +38,7 @@ class G2O_INTERACTIVE_API OnlineVertexSE2 : public VertexSE2 {
  public:
   OnlineVertexSE2() = default;
 
-  void oplusImpl(const VectorX::MapType& update) override {
+  void oplusImpl(const VectorX::MapType& update) {
     VertexSE2::oplusImpl(update);
     updatedEstimate = estimate_;
   }

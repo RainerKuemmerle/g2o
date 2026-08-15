@@ -24,14 +24,14 @@
 // NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 // SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-#include "sparse_optimizer_terminate_action.h"
+#include "g2o/core/sparse_optimizer_terminate_action.h"
 
 #include <cassert>
 #include <limits>
 
 #include "g2o/core/hyper_graph.h"
 #include "g2o/core/hyper_graph_action.h"
-#include "sparse_optimizer.h"
+#include "g2o/core/sparse_optimizer.h"
 
 namespace g2o {
 

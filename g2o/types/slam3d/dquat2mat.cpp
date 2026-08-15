@@ -24,13 +24,13 @@
 // NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 // SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-#include "dquat2mat.h"
+#include "g2o/types/slam3d/dquat2mat.h"
 
 #include <cmath>
 
 namespace g2o::internal {
 
-#include "dquat2mat_maxima_generated.cpp"  // NOLINT
+#include "g2o/types/slam3d/dquat2mat_maxima_generated.cpp"  // NOLINT
 
 namespace {
 enum class Q2M_Type { kDefault, kOne, kTwo, kThree };

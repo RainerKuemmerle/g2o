@@ -1,5 +1,9 @@
 BasedOnStyle: Google
 DerivePointerAlignment: false
+SortIncludes: true
+IncludeCategories:
+    - Regex: '^"g2o/.*"$'
+      Priority: 100
 
 # Starting from clang-format v19 we need to specify those
 AttributeMacros: [

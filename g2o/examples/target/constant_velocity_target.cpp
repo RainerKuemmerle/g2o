@@ -28,19 +28,18 @@
 // moves under piecewise constant velocity in 3D. Its position is
 // measured by an idealised GPS receiver.
 
-#include <g2o/core/block_solver.h>
-#include <g2o/core/optimization_algorithm_gauss_newton.h>
-#include <g2o/core/solver.h>
-#include <g2o/core/sparse_optimizer.h>
-#include <g2o/solvers/eigen/linear_solver_eigen.h>
-#include <g2o/solvers/pcg/linear_solver_pcg.h>
-#include <g2o/stuff/sampler.h>
-
 #include <cstdint>
 #include <iostream>
 
-#include "continuous_to_discrete.h"
-#include "targetTypes6D.hpp"
+#include "g2o/core/block_solver.h"
+#include "g2o/core/optimization_algorithm_gauss_newton.h"
+#include "g2o/core/solver.h"
+#include "g2o/core/sparse_optimizer.h"
+#include "g2o/examples/target/continuous_to_discrete.h"
+#include "g2o/examples/target/targetTypes6D.hpp"
+#include "g2o/solvers/eigen/linear_solver_eigen.h"
+#include "g2o/solvers/pcg/linear_solver_pcg.h"
+#include "g2o/stuff/sampler.h"
 
 namespace g2o {
 

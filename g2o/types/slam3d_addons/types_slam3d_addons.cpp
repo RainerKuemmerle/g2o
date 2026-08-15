@@ -48,11 +48,13 @@ G2O_REGISTER_TYPE_NAME("EDGE_PLANE", EdgePlane);
 G2O_REGISTER_TYPE_NAME("EDGE_SE3_CALIB", EdgeSE3Calib);
 
 #ifdef G2O_HAVE_OPENGL
+// LCOV_EXCL_START
 G2O_REGISTER_ACTION(CacheCameraDrawAction);
 G2O_REGISTER_ACTION(VertexPlaneDrawAction);
 G2O_REGISTER_ACTION(EdgeSE3PlaneSensorCalibDrawAction);
 G2O_REGISTER_ACTION(VertexLine3DDrawAction);
 G2O_REGISTER_ACTION(EdgeSE3Line3DDrawAction);
+// LCOV_EXCL_STOP
 #endif
 
 }  // namespace g2o

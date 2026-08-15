@@ -33,8 +33,8 @@
 #include "g2o/core/optimization_algorithm_factory.h"
 #include "g2o/core/optimization_algorithm_property.h"
 #include "g2o/solvers/eigen/linear_solver_eigen.h"  // IWYU pragma: keep
+#include "g2o/solvers/slam2d_linear/solver_slam2d_linear.h"
 #include "g2o/stuff/logger.h"
-#include "solver_slam2d_linear.h"
 
 namespace g2o {
 

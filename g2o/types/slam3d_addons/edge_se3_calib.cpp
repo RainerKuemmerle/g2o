@@ -24,9 +24,9 @@
 // NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 // SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-#include "edge_se3_calib.h"
+#include "g2o/types/slam3d_addons/edge_se3_calib.h"
 
-#include <Eigen/Geometry>
+#include "Eigen/Geometry"
 
 #include "g2o/types/slam3d/isometry3d_mappings.h"
 

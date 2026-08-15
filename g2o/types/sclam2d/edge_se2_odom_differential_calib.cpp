@@ -24,14 +24,14 @@
 // NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 // SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-#include "edge_se2_odom_differential_calib.h"
+#include "g2o/types/sclam2d/edge_se2_odom_differential_calib.h"
 
 #include <string>
 
 #include "g2o/types/sclam2d/odometry_measurement.h"
 
 #ifdef G2O_HAVE_OPENGL
-#include "g2o/stuff/opengl_wrapper.h"
+#include "g2o/stuff/opengl_interface.h"
 #endif
 
 namespace g2o {
@@ -57,6 +57,7 @@ void EdgeSE2OdomDifferentialCalib::computeError() {
 }
 
 #ifdef G2O_HAVE_OPENGL
+// LCOV_EXCL_START
 EdgeSE2OdomDifferentialCalibDrawAction::EdgeSE2OdomDifferentialCalibDrawAction()
     : DrawAction(typeid(EdgeSE2OdomDifferentialCalib).name()) {}
 
@@ -68,18 +69,21 @@ bool EdgeSE2OdomDifferentialCalibDrawAction::operator()(
   auto fromEdge = e->vertexXn<0>();
   auto toEdge = e->vertexXn<1>();
   if (!fromEdge || !toEdge) return true;
-  glColor3f(0.5F, 0.5F, 0.5F);
-  glPushAttrib(GL_ENABLE_BIT);
-  glDisable(GL_LIGHTING);
-  glBegin(GL_LINES);
-  glVertex3f(static_cast<float>(fromEdge->estimate().translation().x()),
-             static_cast<float>(fromEdge->estimate().translation().y()), 0.F);
-  glVertex3f(static_cast<float>(toEdge->estimate().translation().x()),
-             static_cast<float>(toEdge->estimate().translation().y()), 0.F);
-  glEnd();
-  glPopAttrib();
+  opengl::color3f(0.5F, 0.5F, 0.5F);
+  opengl::push_attrib(opengl::Capability::ENABLE_BIT);
+  opengl::disable(opengl::Capability::LIGHTING);
+  opengl::begin_lines();
+  opengl::vertex3f(static_cast<float>(fromEdge->estimate().translation().x()),
+                   static_cast<float>(fromEdge->estimate().translation().y()),
+                   0.F);
+  opengl::vertex3f(static_cast<float>(toEdge->estimate().translation().x()),
+                   static_cast<float>(toEdge->estimate().translation().y()),
+                   0.F);
+  opengl::end();
+  opengl::pop_attrib();
   return true;
 }
+// LCOV_EXCL_STOP
 #endif
 
 }  // namespace g2o

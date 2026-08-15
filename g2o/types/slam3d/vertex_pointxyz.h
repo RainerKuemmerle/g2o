@@ -35,22 +35,24 @@
 #include "g2o/core/hyper_graph.h"
 #include "g2o/core/hyper_graph_action.h"
 #include "g2o/stuff/property.h"
-#include "g2o_types_slam3d_api.h"
+#include "g2o/types/slam3d/g2o_types_slam3d_api.h"
 
 namespace g2o {
 /**
  * \brief Vertex for a tracked point in space
  */
-class G2O_TYPES_SLAM3D_API VertexPointXYZ : public BaseVertex<3, Vector3> {
+class G2O_TYPES_SLAM3D_API VertexPointXYZ
+    : public BaseVertex<VertexPointXYZ, 3, Vector3> {
  public:
   VertexPointXYZ() = default;
 
-  void oplusImpl(const VectorX::MapType& update) override {
+  void oplusImpl(const VectorX::MapType& update) {
     estimate_ += update.head<kDimension>();
   }
 };
 
 #ifdef G2O_HAVE_OPENGL
+// LCOV_EXCL_START
 /**
  * \brief visualize a 3D point
  */
@@ -65,6 +67,7 @@ class VertexPointXYZDrawAction : public DrawAction {
   DrawAction::Parameters* refreshPropertyPtrs(
       HyperGraphElementAction::Parameters& params_) override;
 };
+// LCOV_EXCL_STOP
 #endif
 
 }  // namespace g2o

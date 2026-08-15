@@ -24,7 +24,7 @@
 // NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 // SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-#include "edge_plane.h"
+#include "g2o/types/slam3d_addons/edge_plane.h"
 
 namespace g2o {
 
@@ -39,8 +39,6 @@ void EdgePlane::computeError() {
   error_ =
       (v2->estimate().toVector() - v1->estimate().toVector()) - measurement_;
 }
-
-void EdgePlane::setMeasurement(const Vector4& m) { measurement_ = m; }
 
 bool EdgePlane::setMeasurementFromState() {
   auto* v1 = vertexXnRaw<0>();

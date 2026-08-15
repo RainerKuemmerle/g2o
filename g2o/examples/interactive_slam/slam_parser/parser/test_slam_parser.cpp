@@ -26,9 +26,9 @@
 
 #include <iostream>
 
-#include "commands.h"
-#include "driver.h"
-#include "slam_context.h"
+#include "g2o/examples/interactive_slam/slam_parser/parser/commands.h"
+#include "g2o/examples/interactive_slam/slam_parser/parser/driver.h"
+#include "g2o/examples/interactive_slam/slam_parser/parser/slam_context.h"
 
 int main() {
   slam_parser::SlamContext slamContext;

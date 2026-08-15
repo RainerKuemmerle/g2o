@@ -36,7 +36,13 @@ implementations of state-of-the-art approaches for the specific problems
 The branch [pymem](https://github.com/RainerKuemmerle/g2o/tree/pymem) contains a python wrapper and switches to smart pointer instead of RAW pointers.
 It is currently experimental but PRs and improvements are welcome - as always.
 
-See [g2o-python](https://github.com/miquelmassot/g2o-python) for the pypi release of g2o's python bindings.
+```
+pip install g2opy
+```
+
+See [g2opy](https://pypi.org/project/g2opy/) for more.
+
+See [g2o-python](https://github.com/miquelmassot/g2o-python) for another project releasing of g2o's python bindings.
 See below for how to install the python bindings from this repository directly.
 
 ## Papers Describing the Approach
@@ -105,23 +111,21 @@ following packages.
 
 -   spdlog <https://github.com/gabime/spdlog>
 -   suitesparse <http://faculty.cse.tamu.edu/davis/suitesparse.html>
--   Qt5 <http://qt-project.org>
--   libQGLViewer <https://gillesdebunne.github.io/libQGLViewer/>
 -   JSON for Modern C++ <https://github.com/nlohmann/json>
+-   Qt6 <http://qt-project.org>
 
 On Ubuntu / Debian these dependencies are resolved by installing the
 following packages.
 
 -   libspdlog-dev
 -   libsuitesparse-dev
--   libcereal-dev
--   qtdeclarative5-dev
--   qt5-qmake
--   libqglviewer-dev-qt5
+-   nlohmann-json3-dev
+-   qt6-declarative-dev
+-   qt6-qmake
 
 You can install those packages with the following command
 ```
-sudo apt install libeigen3-dev libspdlog-dev libsuitesparse-dev qtdeclarative5-dev qt5-qmake libqglviewer-dev-qt5
+sudo apt install libeigen3-dev libspdlog-dev libsuitesparse-dev nlohmann-json3-dev qt6-declarative-dev qt6-qmake
 ```
 
 ## Mac OS X

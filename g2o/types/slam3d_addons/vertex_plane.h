@@ -35,23 +35,23 @@
 #include "g2o/core/hyper_graph.h"
 #include "g2o/core/hyper_graph_action.h"
 #include "g2o/stuff/property.h"
-#include "g2o_types_slam3d_addons_api.h"
-#include "plane3d.h"
+#include "g2o/types/slam3d_addons/g2o_types_slam3d_addons_api.h"
+#include "g2o/types/slam3d_addons/plane3d.h"
 
 namespace g2o {
 
-class G2O_TYPES_SLAM3D_ADDONS_API VertexPlane : public BaseVertex<3, Plane3D> {
+class G2O_TYPES_SLAM3D_ADDONS_API VertexPlane
+    : public BaseVertex<VertexPlane, 3, Plane3D> {
  public:
   VertexPlane();
 
-  void oplusImpl(const VectorX::MapType& update) override {
-    estimate_.oplus(update);
-  }
+  void oplusImpl(const VectorX::MapType& update) { estimate_.oplus(update); }
 
   Vector3 color;
 };
 
 #ifdef G2O_HAVE_OPENGL
+// LCOV_EXCL_START
 class VertexPlaneDrawAction : public DrawAction {
  public:
   VertexPlaneDrawAction();
@@ -63,6 +63,7 @@ class VertexPlaneDrawAction : public DrawAction {
       HyperGraphElementAction::Parameters& params_) override;
   std::shared_ptr<FloatProperty> planeWidth_, planeHeight_;
 };
+// LCOV_EXCL_STOP
 #endif
 
 }  // namespace g2o

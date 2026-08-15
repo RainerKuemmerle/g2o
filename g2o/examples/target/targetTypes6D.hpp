@@ -1,12 +1,13 @@
 #ifndef G2O_TARGET_TYPES_6D_HPP_
 #define G2O_TARGET_TYPES_6D_HPP_
 
-#include <g2o/core/base_binary_edge.h>
-#include <g2o/core/base_unary_edge.h>
-#include <g2o/core/base_vertex.h>
-
-#include <Eigen/Core>
 #include <cassert>
+
+#include "Eigen/Core"
+
+#include "g2o/core/base_binary_edge.h"
+#include "g2o/core/base_unary_edge.h"
+#include "g2o/core/base_vertex.h"
 
 using Vector6d = Eigen::Matrix<double, 6, 1>;
 using Matrix6d = Eigen::Matrix<double, 6, 6>;
@@ -14,24 +15,22 @@ using Matrix6d = Eigen::Matrix<double, 6, 6>;
 // This header file specifies a set of types for the different
 // tracking examples; note that
 
-class VertexPosition3D : public g2o::BaseVertex<3, Eigen::Vector3d> {
+class VertexPosition3D
+    : public g2o::BaseVertex<VertexPosition3D, 3, Eigen::Vector3d> {
  public:
   VertexPosition3D() = default;
 
-  void oplusImpl(const g2o::VectorX::MapType& update) override {
-    estimate_ += update;
-  }
+  void oplusImpl(const g2o::VectorX::MapType& update) { estimate_ += update; }
 };
 
 class PositionVelocity3DEdge {};
 
-class VertexPositionVelocity3D : public g2o::BaseVertex<6, Vector6d> {
+class VertexPositionVelocity3D
+    : public g2o::BaseVertex<VertexPositionVelocity3D, 6, Vector6d> {
  public:
   VertexPositionVelocity3D() = default;
 
-  void oplusImpl(const g2o::VectorX::MapType& update) override {
-    estimate_ += update;
-  }
+  void oplusImpl(const g2o::VectorX::MapType& update) { estimate_ += update; }
 };
 
 // The odometry which links pairs of nodes together

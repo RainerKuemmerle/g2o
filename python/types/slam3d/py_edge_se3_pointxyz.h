@@ -1,6 +1,7 @@
 #pragma once
 
 #include "detail/registry.h"
+
 #include "g2o/types/slam3d/edge_se3_pointxyz.h"
 #include "g2o/types/slam3d/edge_se3_pointxyz_depth.h"
 #include "g2o/types/slam3d/edge_se3_pointxyz_disparity.h"

@@ -32,8 +32,8 @@
 #include "g2o/core/cache.h"
 #include "g2o/core/eigen_types.h"
 #include "g2o/core/parameter.h"
-#include "g2o_types_slam2d_api.h"
-#include "se2.h"
+#include "g2o/types/slam2d/g2o_types_slam2d_api.h"
+#include "g2o/types/slam2d/se2.h"
 
 namespace g2o {
 

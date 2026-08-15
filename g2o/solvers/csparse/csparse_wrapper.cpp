@@ -24,15 +24,16 @@
 // NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 // SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-#include "csparse_wrapper.h"
+#include "g2o/solvers/csparse/csparse_wrapper.h"
 
-#include <Eigen/Core>
 #include <cstring>
 #include <memory>
 
-#include "csparse_extension.h"
-#include "csparse_helper.h"
+#include "Eigen/Core"
+
 #include "g2o/core/eigen_types.h"
+#include "g2o/solvers/csparse/csparse_extension.h"
+#include "g2o/solvers/csparse/csparse_helper.h"
 
 namespace g2o::csparse {
 
@@ -74,27 +75,21 @@ class CSparse::Impl {
       cs_nfree(numericCholesky);
       numericCholesky = nullptr;
     }
-    delete[] csWorkspace;
-    csWorkspace = nullptr;
-    delete[] csIntWorkspace;
-    csIntWorkspace = nullptr;
   }
 
   void prepareWorkspace() {
     // re-allocate the temporary workspace for cholesky
-    if (csWorkspaceSize < ccsA.n) {
-      csWorkspaceSize = csWorkspaceSize == 0 ? ccsA.n : 2 * ccsA.n;
-      delete[] csWorkspace;
-      csWorkspace = new double[csWorkspaceSize];
-      delete[] csIntWorkspace;
-      csIntWorkspace = new int[2L * csWorkspaceSize];
+    if (csWorkspace.size() < static_cast<size_t>(ccsA.n)) {
+      const size_t desired_size = csWorkspace.empty() ? ccsA.n : 2 * ccsA.n;
+      csWorkspace.resize(desired_size);
+      csIntWorkspace.resize(2L * desired_size);
     }
   }
 
   css* symbolicDecomposition = nullptr;
   int csWorkspaceSize = 0;
-  double* csWorkspace = nullptr;
-  int* csIntWorkspace = nullptr;
+  std::vector<double> csWorkspace;
+  std::vector<int> csIntWorkspace;
   csn* numericCholesky = nullptr;
   CSparseExt ccsA;
 };
@@ -150,8 +145,8 @@ bool CSparse::solve(double* x, double* b) const {
 
   if (x != b) memcpy(x, b, pImpl_->ccsA.n * sizeof(double));
   const int ok = csparse_extension::cs_cholsolsymb(
-      &pImpl_->ccsA, x, pImpl_->symbolicDecomposition, pImpl_->csWorkspace,
-      pImpl_->csIntWorkspace);
+      &pImpl_->ccsA, x, pImpl_->symbolicDecomposition,
+      pImpl_->csWorkspace.data(), pImpl_->csIntWorkspace.data());
   return static_cast<bool>(ok);
 }
 
@@ -193,8 +188,8 @@ bool CSparse::factorize() {
   pImpl_->prepareWorkspace();
   freeFactor();
   pImpl_->numericCholesky = csparse_extension::cs_chol_workspace(
-      &pImpl_->ccsA, pImpl_->symbolicDecomposition, pImpl_->csIntWorkspace,
-      pImpl_->csWorkspace);
+      &pImpl_->ccsA, pImpl_->symbolicDecomposition,
+      pImpl_->csIntWorkspace.data(), pImpl_->csWorkspace.data());
 
   return pImpl_->numericCholesky != nullptr;
 }

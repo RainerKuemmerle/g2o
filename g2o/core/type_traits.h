@@ -27,7 +27,7 @@
 #ifndef G2O_TYPE_TRAITS_H
 #define G2O_TYPE_TRAITS_H
 
-#include "eigen_types.h"
+#include "g2o/core/eigen_types.h"
 
 namespace g2o {
 

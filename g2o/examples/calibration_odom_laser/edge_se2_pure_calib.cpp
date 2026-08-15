@@ -24,7 +24,7 @@
 // NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 // SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-#include "edge_se2_pure_calib.h"
+#include "g2o/examples/calibration_odom_laser/edge_se2_pure_calib.h"
 
 namespace g2o {
 

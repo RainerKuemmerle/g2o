@@ -4,6 +4,6 @@
 
 namespace g2o {
 
-void delcareEstimatePropagator(py::module& m);
+void delcareEstimatePropagator(py::module_& m);
 
 }  // namespace g2o

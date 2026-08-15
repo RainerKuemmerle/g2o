@@ -1,12 +1,13 @@
 #pragma once
 
 #include "detail/registry.h"
+
 #include "g2o/types/slam3d/se3quat.h"
 
 namespace g2o {
 
 inline void declareSE3Quat(detail::Registry& registry) {
-  py::classh<SE3Quat>(registry.mod(), "SE3Quat")
+  py::class_<SE3Quat>(registry.mod(), "SE3Quat")
       .def(py::init<>())
       .def(py::init<const Eigen::Ref<const Matrix3>&,
                     const Eigen::Ref<const Vector3>&>(),

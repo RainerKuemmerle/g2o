@@ -24,7 +24,7 @@
 // NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 // SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-#include "csparse_helper.h"
+#include "g2o/solvers/csparse/csparse_helper.h"
 
 #include "g2o/stuff/sparse_helper.h"
 

@@ -3,12 +3,12 @@
 import argparse
 import json
 import sys
-from typing import Any, Optional
+from typing import Any
 
 import jsonschema
 
 
-def read_json(filename) -> Optional[Any]:
+def read_json(filename) -> Any | None:
     """Reads the content of filename as JSON and returns the dict
 
     Args:
@@ -21,7 +21,7 @@ def read_json(filename) -> Optional[Any]:
         with open(filename) as schema_file:
             content = json.load(schema_file)
             return content
-    except Exception:
+    except (OSError, json.JSONDecodeError):
         return None
 
 

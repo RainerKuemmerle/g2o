@@ -34,10 +34,10 @@
 #include "g2o/core/hyper_graph.h"
 #include "g2o/core/hyper_graph_action.h"
 #include "g2o/stuff/property.h"
+#include "g2o/types/data/g2o_types_data_api.h"
+#include "g2o/types/data/laser_parameters.h"
+#include "g2o/types/data/raw_laser.h"
 #include "g2o/types/slam2d/se2.h"
-#include "g2o_types_data_api.h"
-#include "laser_parameters.h"
-#include "raw_laser.h"
 
 namespace g2o {
 
@@ -67,6 +67,7 @@ class G2O_TYPES_DATA_API RobotLaser : public RawLaser {
 };
 
 #ifdef G2O_HAVE_OPENGL
+// LCOV_EXCL_START
 class G2O_TYPES_DATA_API RobotLaserDrawAction : public DrawAction {
  public:
   RobotLaserDrawAction();
@@ -80,6 +81,7 @@ class G2O_TYPES_DATA_API RobotLaserDrawAction : public DrawAction {
   std::shared_ptr<FloatProperty> pointSize_;
   std::shared_ptr<FloatProperty> maxRange_;
 };
+// LCOV_EXCL_STOP
 #endif
 
 }  // namespace g2o

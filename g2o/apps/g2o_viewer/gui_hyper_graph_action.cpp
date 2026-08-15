@@ -16,12 +16,12 @@
 // You should have received a copy of the GNU General Public License
 // along with g2o.  If not, see <http://www.gnu.org/licenses/>.
 
-#include "gui_hyper_graph_action.h"
+#include "g2o/apps/g2o_viewer/gui_hyper_graph_action.h"
 
 #include <QApplication>
 #include <QtGlobal>
 
-#include "g2o_qglviewer.h"
+#include "g2o/apps/g2o_viewer/g2o_qglviewer.h"
 
 namespace g2o {
 

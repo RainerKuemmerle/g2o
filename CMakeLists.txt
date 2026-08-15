@@ -15,9 +15,9 @@ set(LIB_PREFIX g2o_)
 set(g2o_C_FLAGS)
 set(g2o_CXX_FLAGS)
 
-set(G2O_LIB_VERSION   "2.2.0" CACHE STRING "g2o library version")
-set(G2O_LIB_SOVERSION "2.2"   CACHE STRING "g2o library soversion")
-set(G2O_VERSION 2.2.0)
+set(G2O_LIB_VERSION   "2.3.0" CACHE STRING "g2o library version")
+set(G2O_LIB_SOVERSION "2.3"   CACHE STRING "g2o library soversion")
+set(G2O_VERSION 2.3.0)
 
 # manually check for top-level project if CMake is older than 3.21
 if(CMAKE_VERSION VERSION_LESS 3.21)
@@ -80,7 +80,7 @@ set(INCLUDES_DESTINATION ${CMAKE_INSTALL_INCLUDEDIR})
 set(INCLUDES_INSTALL_DIR ${INCLUDES_DESTINATION}/${PROJECT_NAME})
 
 # Set search directory for looking for our custom CMake scripts to
-# look for SuiteSparse, QGLViewer, and Eigen3.
+# look for SuiteSparse and Eigen3.
 list(APPEND CMAKE_MODULE_PATH ${g2o_SOURCE_DIR}/cmake_modules)
 
 # Detect OS and define macros appropriately
@@ -167,23 +167,24 @@ endif(G2O_USE_OPENMP)
 set(OpenGL_GL_PREFERENCE "GLVND")
 find_package(OpenGL)
 
-# If OpenGL was found, use the import target if available. If not, use old-style includes
+# Option to enable OpenGL support
 option(G2O_USE_OPENGL "Build g2o with OpenGL support for visualization" ON)
 set(G2O_HAVE_OPENGL 0)
-if (OPENGL_FOUND AND G2O_USE_OPENGL)
-  if (TARGET OpenGL::GL)
-    set(G2O_OPENGL_TARGET "OpenGL::GL;OpenGL::GLU")
-  else()
-    set(G2O_OPENGL_TARGET "${OPENGL_LIBRARIES}")
-    include_directories(${OPENGL_INCLUDE_DIR})
-  endif()
-  set(G2O_HAVE_OPENGL 1)
-  message(STATUS "Compiling with OpenGL support")
-  #message(WARNING G2O_OPENGL_TARGET=${G2O_OPENGL_TARGET})
-endif()
 
-# For building the GUI
-find_package(QGLViewer)
+# For building the GUI: prefer Qt6 and use its OpenGLWidgets as the backend
+set(QT_DEFAULT_MAJOR_VERSION 6)
+find_package(Qt6 COMPONENTS Widgets OpenGLWidgets)
+
+if (G2O_USE_OPENGL)
+  if (TARGET Qt6::OpenGLWidgets)
+    set(G2O_OPENGL_TARGET "Qt6::OpenGLWidgets")
+    set(G2O_HAVE_OPENGL 1)
+    message(STATUS "Using Qt6::OpenGLWidgets as OpenGL backend")
+  else()
+    set(G2O_HAVE_OPENGL 0)
+    message(WARNING "Qt6::OpenGLWidgets not found; OpenGL support disabled. Install Qt6 with OpenGL support to enable visualization.")
+  endif()
+endif()
 
 # Logging library
 option(G2O_USE_LOGGING "Try to use spdlog for logging" ON)

@@ -24,11 +24,11 @@
 // NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 // SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-#include <gmock/gmock.h>
+#include "gmock/gmock.h"
+#include "unit_test/test_helper/eigen_matcher.h"
 
 #include "g2o/core/eigen_types.h"
 #include "g2o/stuff/unscented.h"
-#include "unit_test/test_helper/eigen_matcher.h"
 
 namespace {
 using MySigmaPoint = g2o::SigmaPoint<g2o::VectorX>;

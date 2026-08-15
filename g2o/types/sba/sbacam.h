@@ -38,13 +38,14 @@
 #ifndef G2O_SBACam_H
 #define G2O_SBACam_H
 
-#include <Eigen/Core>
 #include <iosfwd>
+
+#include "Eigen/Core"
 
 #include "g2o/core/eigen_types.h"
 #include "g2o/core/type_traits.h"
+#include "g2o/types/sba/g2o_types_sba_api.h"
 #include "g2o/types/slam3d/se3quat.h"
-#include "g2o_types_sba_api.h"
 
 namespace g2o {
 template <typename T>

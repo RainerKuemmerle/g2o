@@ -24,12 +24,12 @@
 // NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 // SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-#include "vertex_segment2d.h"
+#include "g2o/types/slam2d_addons/vertex_segment2d.h"
 
 #include "g2o/core/hyper_graph_action.h"
 
 #ifdef G2O_HAVE_OPENGL
-#include "g2o/stuff/opengl_wrapper.h"
+#include "g2o/stuff/opengl_interface.h"
 #endif
 
 #include <string>
@@ -40,6 +40,7 @@ namespace g2o {
 VertexSegment2D::VertexSegment2D() { estimate_.setZero(); }
 
 #ifdef G2O_HAVE_OPENGL
+// LCOV_EXCL_START
 VertexSegment2DDrawAction::VertexSegment2DDrawAction()
     : DrawAction(typeid(VertexSegment2D).name()), pointSize_(nullptr) {}
 
@@ -64,18 +65,19 @@ bool VertexSegment2DDrawAction::operator()(
   if (show_ && !show_->value()) return true;
 
   auto* that = static_cast<VertexSegment2D*>(&element);
-  glColor3f(0.8F, 0.5F, 0.3F);
+  g2o::opengl::color3f(0.8F, 0.5F, 0.3F);
   if (pointSize_) {
-    glPointSize(pointSize_->value());
+    g2o::opengl::point_size(pointSize_->value());
   }
-  glBegin(GL_LINES);
-  glVertex3f(static_cast<float>(that->estimateP1().x()),
-             static_cast<float>(that->estimateP1().y()), 0.F);
-  glVertex3f(static_cast<float>(that->estimateP2().x()),
-             static_cast<float>(that->estimateP2().y()), 0.F);
-  glEnd();
+  g2o::opengl::begin_lines();
+  g2o::opengl::vertex3f(static_cast<float>(that->estimateP1().x()),
+                        static_cast<float>(that->estimateP1().y()), 0.F);
+  g2o::opengl::vertex3f(static_cast<float>(that->estimateP2().x()),
+                        static_cast<float>(that->estimateP2().y()), 0.F);
+  g2o::opengl::end();
   return true;
 }
+// LCOV_EXCL_STOP
 #endif
 
 }  // namespace g2o

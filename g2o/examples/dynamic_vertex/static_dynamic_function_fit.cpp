@@ -14,7 +14,8 @@
 // changed dynamically.
 
 #include <random>
-#include <unsupported/Eigen/Polynomials>
+
+#include "unsupported/Eigen/Polynomials"
 
 #include "g2o/core/base_binary_edge.h"
 #include "g2o/core/base_dynamic_vertex.h"
@@ -31,30 +32,28 @@
 // This vertex stores the coefficients of the f(x) polynomial. This is
 // quadratic, and always has a degree of three.
 
-class FPolynomialCoefficientVertex : public g2o::BaseVertex<3, g2o::Vector3> {
+class FPolynomialCoefficientVertex
+    : public g2o::BaseVertex<FPolynomialCoefficientVertex, 3, g2o::Vector3> {
  public:
   // Create the vertex
   FPolynomialCoefficientVertex() { setEstimate(g2o::Vector3::Zero()); }
 
   // Direct linear add
-  void oplusImpl(const g2o::VectorX::MapType& update) override {
-    estimate_ += update;
-  }
+  void oplusImpl(const g2o::VectorX::MapType& update) { estimate_ += update; }
 };
 
 // This vertex stores the coefficients of the p(x) polynomial. It is dynamic
 // because we can change it at runtime.
 
 class PPolynomialCoefficientVertex
-    : public g2o::BaseDynamicVertex<Eigen::VectorXd> {
+    : public g2o::BaseDynamicVertex<PPolynomialCoefficientVertex,
+                                    Eigen::VectorXd> {
  public:
   // Create the vertex
   PPolynomialCoefficientVertex() = default;
 
   // Direct linear add
-  void oplusImpl(const g2o::VectorX::MapType& update) override {
-    estimate_ += update;
-  }
+  void oplusImpl(const g2o::VectorX::MapType& update) { estimate_ += update; }
 
   // Resize the vertex state. In this case, we simply trash whatever
   // was there before.

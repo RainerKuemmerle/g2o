@@ -24,9 +24,8 @@
 // NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 // SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-#include "robot_laser.h"
+#include "g2o/types/data/robot_laser.h"
 
-#include <Eigen/Core>
 #include <cmath>
 #include <cstddef>
 #include <iomanip>  // IWYU pragma: keep
@@ -35,6 +34,8 @@
 #include <typeinfo>
 #include <vector>
 
+#include "Eigen/Core"
+
 #include "g2o/core/eigen_types.h"
 #include "g2o/core/hyper_graph_action.h"
 #include "g2o/stuff/macros.h"
@@ -42,7 +43,8 @@
 #include "g2o/types/data/raw_laser.h"
 
 #ifdef G2O_HAVE_OPENGL
-#include "g2o/stuff/opengl_wrapper.h"
+#include "g2o/stuff/opengl_interface.h"
+#include "g2o/stuff/opengl_primitives.h"
 #endif
 
 namespace g2o {
@@ -115,6 +117,7 @@ bool RobotLaser::write(std::ostream& os) const {
 void RobotLaser::setOdomPose(const SE2& odomPose) { odomPose_ = odomPose; }
 
 #ifdef G2O_HAVE_OPENGL
+// LCOV_EXCL_START
 RobotLaserDrawAction::RobotLaserDrawAction()
     : DrawAction(typeid(RobotLaser).name()),
       beamsDownsampling_(nullptr),
@@ -159,29 +162,30 @@ bool RobotLaserDrawAction::operator()(
     points = npoints;
   }
 
-  glPushMatrix();
+  opengl::push_matrix();
   const SE2& laserPose = that->laserParams().laserPose;
-  glTranslatef(static_cast<float>(laserPose.translation().x()),
-               static_cast<float>(laserPose.translation().y()), 0.F);
-  glRotatef(static_cast<float> RAD2DEG(laserPose.rotation().angle()), 0.F, 0.F,
-            1.F);
-  glColor4f(1.F, 0.F, 0.F, 0.5F);
+  opengl::translatef(static_cast<float>(laserPose.translation().x()),
+                     static_cast<float>(laserPose.translation().y()), 0.F);
+  opengl::rotatef(static_cast<float> RAD2DEG(laserPose.rotation().angle()), 0.F,
+                  0.F, 1.F);
+  opengl::color4f(1.F, 0.F, 0.F, 0.5F);
   int step = 1;
   if (beamsDownsampling_) step = beamsDownsampling_->value();
   if (pointSize_) {
-    glPointSize(pointSize_->value());
+    opengl::point_size(pointSize_->value());
   }
 
-  glBegin(GL_POINTS);
+  opengl::begin_points();
   for (size_t i = 0; i < points.size(); i += step) {
-    glVertex3f(static_cast<float>(points[i].x()),
-               static_cast<float>(points[i].y()), 0.F);
+    opengl::vertex3f(static_cast<float>(points[i].x()),
+                     static_cast<float>(points[i].y()), 0.F);
   }
-  glEnd();
-  glPopMatrix();
+  opengl::end();
+  opengl::pop_matrix();
 
   return true;
 }
+// LCOV_EXCL_STOP
 #endif
 
 }  // namespace g2o

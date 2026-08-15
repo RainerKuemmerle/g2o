@@ -22,7 +22,7 @@
 
 #include "g2o/core/factory.h"
 #include "g2o/core/sparse_optimizer.h"
-#include "main_window.h"
+#include "g2o/examples/slam2d/main_window.h"
 
 G2O_USE_TYPE_GROUP(slam2d);
 

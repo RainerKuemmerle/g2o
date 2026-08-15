@@ -3,14 +3,13 @@
 #include "g2opy.h"
 
 template <class EdgeBase>
-class PyEdgeTrampoline : public EdgeBase,
-                         public py::trampoline_self_life_support {
+class PyEdgeTrampoline : public EdgeBase {
  public:
-  using EdgeBase::EdgeBase;  // Inherit constructors
+  NB_TRAMPOLINE(EdgeBase, 2);
   void computeError() override {
-    PYBIND11_OVERRIDE_NAME(void, EdgeBase, "compute_error", computeError, );
+    NB_OVERRIDE_NAME("compute_error", computeError, );
   }
   void linearizeOplus() override {
-    PYBIND11_OVERRIDE_NAME(void, EdgeBase, "linearize_oplus", linearizeOplus, );
+    NB_OVERRIDE_NAME("linearize_oplus", linearizeOplus, );
   }
 };

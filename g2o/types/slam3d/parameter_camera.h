@@ -38,8 +38,8 @@
 #include "g2o/core/parameter.h"
 #include "g2o/core/type_traits.h"
 #include "g2o/stuff/property.h"
-#include "g2o_types_slam3d_api.h"
-#include "type_traits_isometry3.h"
+#include "g2o/types/slam3d/g2o_types_slam3d_api.h"
+#include "g2o/types/slam3d/type_traits_isometry3.h"
 
 namespace g2o {
 
@@ -167,6 +167,7 @@ class G2O_TYPES_SLAM3D_API CacheCamera : public Cache {
 };
 
 #ifdef G2O_HAVE_OPENGL
+// LCOV_EXCL_START
 class G2O_TYPES_SLAM3D_API CacheCameraDrawAction : public DrawAction {
  public:
   CacheCameraDrawAction();
@@ -178,6 +179,7 @@ class G2O_TYPES_SLAM3D_API CacheCameraDrawAction : public DrawAction {
       HyperGraphElementAction::Parameters& params_) override;
   std::shared_ptr<FloatProperty> cameraZ_, cameraSide_;
 };
+// LCOV_EXCL_STOP
 #endif
 
 }  // namespace g2o

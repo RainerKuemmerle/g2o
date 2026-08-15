@@ -4,6 +4,6 @@
 
 namespace g2o {
 
-void declareHyperGraph(py::module& m);
+void declareHyperGraph(py::module_& m);
 
 }  // end namespace g2o

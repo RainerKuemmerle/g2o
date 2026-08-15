@@ -27,8 +27,9 @@
 #ifndef G2O_VERTEX_POINT_XY_H
 #define G2O_VERTEX_POINT_XY_H
 
-#include <Eigen/Core>
 #include <memory>
+
+#include "Eigen/Core"
 
 #include "g2o/config.h"
 #include "g2o/core/base_vertex.h"
@@ -36,20 +37,22 @@
 #include "g2o/core/hyper_graph.h"
 #include "g2o/core/hyper_graph_action.h"
 #include "g2o/stuff/property.h"
-#include "g2o_types_slam2d_api.h"
+#include "g2o/types/slam2d/g2o_types_slam2d_api.h"
 
 namespace g2o {
 
-class G2O_TYPES_SLAM2D_API VertexPointXY : public BaseVertex<2, Vector2> {
+class G2O_TYPES_SLAM2D_API VertexPointXY
+    : public BaseVertex<VertexPointXY, 2, Vector2> {
  public:
   VertexPointXY();
 
-  void oplusImpl(const VectorX::MapType& update) override {
+  void oplusImpl(const VectorX::MapType& update) {
     estimate_ += update.head<2>();
   }
 };
 
 #ifdef G2O_HAVE_OPENGL
+// LCOV_EXCL_START
 class G2O_TYPES_SLAM2D_API VertexPointXYDrawAction : public DrawAction {
  public:
   VertexPointXYDrawAction();
@@ -61,6 +64,7 @@ class G2O_TYPES_SLAM2D_API VertexPointXYDrawAction : public DrawAction {
   DrawAction::Parameters* refreshPropertyPtrs(
       HyperGraphElementAction::Parameters& params) override;
 };
+// LCOV_EXCL_STOP
 #endif
 
 }  // namespace g2o

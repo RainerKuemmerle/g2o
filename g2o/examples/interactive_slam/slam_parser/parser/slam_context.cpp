@@ -24,11 +24,11 @@
 // NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 // SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-#include "slam_context.h"
+#include "g2o/examples/interactive_slam/slam_parser/parser/slam_context.h"
 
 #include <iostream>
 
-#include "commands.h"
+#include "g2o/examples/interactive_slam/slam_parser/parser/commands.h"
 
 using std::cerr;
 using std::endl;

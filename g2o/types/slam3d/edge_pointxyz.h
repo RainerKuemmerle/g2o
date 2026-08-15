@@ -27,13 +27,13 @@
 #ifndef G2O_EDGE_POINTXYZ_H
 #define G2O_EDGE_POINTXYZ_H
 
-#include <Eigen/Core>
+#include "Eigen/Core"
 
 #include "g2o/core/base_binary_edge.h"
 #include "g2o/core/eigen_types.h"
 #include "g2o/core/optimizable_graph.h"
-#include "g2o_types_slam3d_api.h"
-#include "vertex_pointxyz.h"
+#include "g2o/types/slam3d/g2o_types_slam3d_api.h"
+#include "g2o/types/slam3d/vertex_pointxyz.h"
 
 namespace g2o {
 
@@ -47,8 +47,6 @@ class G2O_TYPES_SLAM3D_API EdgePointXYZ
     const VertexPointXYZ* v2 = vertexXnRaw<1>();
     error_ = (v2->estimate() - v1->estimate()) - measurement_;
   }
-
-  void setMeasurement(const Vector3& m) override { measurement_ = m; }
 
   bool setMeasurementFromState() override {
     const VertexPointXYZ* v1 = vertexXnRaw<0>();

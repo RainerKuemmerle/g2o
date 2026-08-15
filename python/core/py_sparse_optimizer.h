@@ -4,6 +4,6 @@
 
 namespace g2o {
 
-void declareSparseOptimizer(py::module& m);
+void declareSparseOptimizer(py::module_& m);
 
 }  // end namespace g2o

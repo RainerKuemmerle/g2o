@@ -34,8 +34,8 @@
 #include <vector>
 
 #include "g2o/core/optimizable_graph.h"
+#include "g2o/simulator/g2o_simulator_api.h"
 #include "g2o/stuff/sampler.h"
-#include "g2o_simulator_api.h"
 
 namespace g2o {
 

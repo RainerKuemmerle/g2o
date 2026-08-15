@@ -32,9 +32,9 @@
 #include "g2o/core/hyper_graph.h"
 #include "g2o/core/hyper_graph_action.h"
 #include "g2o/core/optimizable_graph.h"
+#include "g2o/types/sclam2d/g2o_types_sclam2d_api.h"
 #include "g2o/types/slam2d/se2.h"
 #include "g2o/types/slam2d/vertex_se2.h"
-#include "g2o_types_sclam2d_api.h"
 
 namespace g2o {
 
@@ -58,12 +58,14 @@ class G2O_TYPES_SCLAM2D_API EdgeSE2SensorCalib
 };
 
 #ifdef G2O_HAVE_OPENGL
+// LCOV_EXCL_START
 class EdgeSE2SensorCalibDrawAction : public DrawAction {
  public:
   EdgeSE2SensorCalibDrawAction();
   bool operator()(HyperGraph::HyperGraphElement& element,
                   HyperGraphElementAction::Parameters& params_) override;
 };
+// LCOV_EXCL_STOP
 #endif
 
 }  // namespace g2o

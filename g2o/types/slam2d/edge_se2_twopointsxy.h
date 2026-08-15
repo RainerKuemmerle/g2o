@@ -29,9 +29,9 @@
 
 #include "g2o/core/base_fixed_sized_edge.h"
 #include "g2o/core/eigen_types.h"
+#include "g2o/types/slam2d/g2o_types_slam2d_api.h"
 #include "g2o/types/slam2d/vertex_point_xy.h"
 #include "g2o/types/slam2d/vertex_se2.h"
-#include "g2o_types_slam2d_api.h"
 
 namespace g2o {
 

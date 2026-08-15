@@ -24,7 +24,7 @@
 // NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 // SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-#include "edge_project_p2mc.h"
+#include "g2o/types/sba/edge_project_p2mc.h"
 
 #include "g2o/stuff/logger.h"
 #include "g2o/types/sba/sbacam.h"

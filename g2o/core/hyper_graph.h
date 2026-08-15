@@ -37,7 +37,7 @@
 #include <utility>
 #include <vector>
 
-#include "g2o_core_api.h"
+#include "g2o/core/g2o_core_api.h"
 
 /** @addtogroup graph */
 //@{

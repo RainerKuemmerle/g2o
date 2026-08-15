@@ -27,7 +27,6 @@
 #ifndef G2O_AIS_OPTIMIZABLE_GRAPH_HH_
 #define G2O_AIS_OPTIMIZABLE_GRAPH_HH_
 
-#include <Eigen/Core>
 #include <cstddef>
 #include <cstdint>
 #include <functional>
@@ -38,14 +37,16 @@
 #include <unordered_set>
 #include <vector>
 
+#include "Eigen/Core"
+
 #include "g2o/core/eigen_types.h"
+#include "g2o/core/g2o_core_api.h"
+#include "g2o/core/hyper_graph.h"
 #include "g2o/core/io/io_format.h"
-#include "g2o_core_api.h"
-#include "hyper_graph.h"
-#include "jacobian_workspace.h"
-#include "openmp_mutex.h"
-#include "parameter.h"
-#include "parameter_container.h"
+#include "g2o/core/jacobian_workspace.h"
+#include "g2o/core/openmp_mutex.h"
+#include "g2o/core/parameter.h"
+#include "g2o/core/parameter_container.h"
 
 namespace g2o {
 
@@ -341,14 +342,10 @@ class G2O_CORE_API OptimizableGraph : public HyperGraph {
 
     /**
      * Update the position of the node from the parameters in v.
-     * Depends on the implementation of oplusImpl in derived classes to actually
-     * carry out the update. Will also call updateCache() to update the caches
-     * of depending on the vertex.
+     * Typed vertex bases provide the implementation and update dependent
+     * caches after applying the increment.
      */
-    void oplus(const VectorX::MapType& v) {
-      oplusImpl(v);
-      updateCache();
-    }
+    virtual void oplus(const VectorX::MapType& v) = 0;
 
     //! temporary index of this node in the parameter vector obtained from
     //! linearization
@@ -391,8 +388,6 @@ class G2O_CORE_API OptimizableGraph : public HyperGraph {
      */
     void unlockQuadraticForm() { quadraticFormMutex_.unlock(); }
 
-    virtual void updateCache();
-
     CacheContainer& cacheContainer();
 
    protected:
@@ -404,12 +399,6 @@ class G2O_CORE_API OptimizableGraph : public HyperGraph {
     OpenMPMutex quadraticFormMutex_;
 
     std::unique_ptr<CacheContainer> cacheContainer_{nullptr};
-
-    /**
-     * update the position of the node from the parameters in v.
-     * Implement in your class!
-     */
-    virtual void oplusImpl(const VectorX::MapType& v) = 0;
 
     /**
      * sets the initial estimate from an array of double
@@ -425,7 +414,7 @@ class G2O_CORE_API OptimizableGraph : public HyperGraph {
 
    public:
     // indicates if all vertices are fixed
-    [[nodiscard]] virtual bool allVerticesFixed() const = 0;
+    [[nodiscard]] virtual bool allVerticesFixed() const;
 
     // computes the error of the edge and stores it in an internal structure
     virtual void computeError() = 0;
@@ -510,7 +499,7 @@ class G2O_CORE_API OptimizableGraph : public HyperGraph {
      * vertices in the edge.
      */
     virtual void initialEstimate(const OptimizableGraph::VertexSet& from,
-                                 OptimizableGraph::Vertex* to) = 0;
+                                 OptimizableGraph::Vertex* to);
 
     /**
      * override in your class if it's possible to initialize the vertices in
@@ -533,8 +522,6 @@ class G2O_CORE_API OptimizableGraph : public HyperGraph {
     //! returns the dimensions of the error function
     [[nodiscard]] int dimension() const { return dimension_; }
     [[nodiscard]] virtual int dimensionAtCompileTime() const = 0;
-
-    virtual Vertex* createVertex(int) { return nullptr; }
 
     //! the internal ID of the edge
     [[nodiscard]] int64_t internalId() const { return internalId_; }

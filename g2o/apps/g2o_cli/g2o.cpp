@@ -34,7 +34,9 @@
 #include <string_view>
 
 #include "CLI/CLI.hpp"
-#include "dl_wrapper.h"
+
+#include "g2o/apps/g2o_cli/dl_wrapper.h"
+#include "g2o/apps/g2o_cli/g2o_common.h"
 #include "g2o/core/batch_stats.h"
 #include "g2o/core/estimate_propagator.h"
 #include "g2o/core/factory.h"
@@ -50,7 +52,6 @@
 #include "g2o/stuff/logger.h"
 #include "g2o/stuff/macros.h"
 #include "g2o/stuff/timeutil.h"
-#include "g2o_common.h"
 
 namespace {
 bool hasToStop = false;
@@ -130,6 +131,7 @@ int main(int argc, char** argv) {
   std::string robustKernel;
   bool computeMarginals = false;
   bool printSolverProperties = false;
+  bool printGraphSummary = false;
   double huberWidth = -1.;
   double gain = 1e-6;
   int maxIterationsWithGain = std::numeric_limits<int>::max();
@@ -207,6 +209,8 @@ int main(int argc, char** argv) {
                  "specify a types library which will be loaded");
 #endif
   app.add_option("--stats", statsFile, "specify a file for the statistics");
+  app.add_flag("--graph_summary", printGraphSummary,
+               "print a short summary of the loaded graph and exit");
   app.add_flag("--list_types", listTypes, "list the registered types");
   app.add_flag("--list_robust_kernels", listRobustKernels,
                "list the registered robust kernels");
@@ -315,6 +319,11 @@ int main(int argc, char** argv) {
   }
   cerr << "Loaded " << optimizer.vertices().size() << " vertices\n";
   cerr << "Loaded " << optimizer.edges().size() << " edges\n";
+
+  if (printGraphSummary) {
+    optimizer.printGraphSummary(cout);
+    return 0;
+  }
 
   if (optimizer.vertices().empty()) {
     cerr << "Graph contains no vertices\n";

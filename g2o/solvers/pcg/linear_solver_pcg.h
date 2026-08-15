@@ -27,12 +27,13 @@
 #ifndef G2O_LINEAR_SOLVER_PCG_H
 #define G2O_LINEAR_SOLVER_PCG_H
 
-#include <Eigen/Core>
 #include <cassert>
 #include <cstddef>
 #include <functional>
 #include <utility>
 #include <vector>
+
+#include "Eigen/Core"
 
 #include "g2o/core/batch_stats.h"
 #include "g2o/core/eigen_types.h"

@@ -24,7 +24,7 @@
 // NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 // SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-#include "vertex_plane.h"
+#include "g2o/types/slam3d_addons/vertex_plane.h"
 
 #include <string>
 #include <typeinfo>
@@ -32,7 +32,7 @@
 #include "g2o/core/hyper_graph_action.h"
 #include "g2o/stuff/macros.h"
 #include "g2o/stuff/misc.h"
-#include "g2o/stuff/opengl_wrapper.h"
+#include "g2o/stuff/opengl_interface.h"
 #include "g2o/types/slam3d_addons/plane3d.h"
 
 namespace g2o {
@@ -40,6 +40,7 @@ namespace g2o {
 VertexPlane::VertexPlane() { color << cst(.2), cst(.2), cst(.2); }
 
 #ifdef G2O_HAVE_OPENGL
+// LCOV_EXCL_START
 
 VertexPlaneDrawAction::VertexPlaneDrawAction()
     : DrawAction(typeid(VertexPlane).name()),
@@ -71,26 +72,28 @@ bool VertexPlaneDrawAction::operator()(
     double d = that->estimate().distance();
     double azimuth = Plane3D::azimuth(that->estimate().normal());
     double elevation = Plane3D::elevation(that->estimate().normal());
-    glColor3f(static_cast<float>(that->color(0)),
-              static_cast<float>(that->color(1)),
-              static_cast<float>(that->color(2)));
-    glPushMatrix();
-    glRotatef(static_cast<float>(RAD2DEG(azimuth)), 0.F, 0.F, 1.F);
-    glRotatef(static_cast<float>(RAD2DEG(elevation)), 0.F, -1.F, 0.F);
-    glTranslatef(static_cast<float>(d), 0.F, 0.F);
+    g2o::opengl::color3f(static_cast<float>(that->color(0)),
+                         static_cast<float>(that->color(1)),
+                         static_cast<float>(that->color(2)));
+    g2o::opengl::push_matrix();
+    g2o::opengl::rotatef(static_cast<float>(RAD2DEG(azimuth)), 0.F, 0.F, 1.F);
+    g2o::opengl::rotatef(static_cast<float>(RAD2DEG(elevation)), 0.F, -1.F,
+                         0.F);
+    g2o::opengl::translatef(static_cast<float>(d), 0.F, 0.F);
 
-    glBegin(GL_QUADS);
-    glNormal3f(-1.F, 0.F, 0.F);
-    glVertex3f(0.F, -planeWidth_->value(), -planeHeight_->value());
-    glVertex3f(0.F, planeWidth_->value(), -planeHeight_->value());
-    glVertex3f(0.F, planeWidth_->value(), planeHeight_->value());
-    glVertex3f(0.F, -planeWidth_->value(), planeHeight_->value());
-    glEnd();
-    glPopMatrix();
+    g2o::opengl::begin_quads();
+    g2o::opengl::normal3f(-1.F, 0.F, 0.F);
+    g2o::opengl::vertex3f(0.F, -planeWidth_->value(), -planeHeight_->value());
+    g2o::opengl::vertex3f(0.F, planeWidth_->value(), -planeHeight_->value());
+    g2o::opengl::vertex3f(0.F, planeWidth_->value(), planeHeight_->value());
+    g2o::opengl::vertex3f(0.F, -planeWidth_->value(), planeHeight_->value());
+    g2o::opengl::end();
+    g2o::opengl::pop_matrix();
   }
 
   return true;
 }
+// LCOV_EXCL_STOP
 #endif
 
 }  // namespace g2o

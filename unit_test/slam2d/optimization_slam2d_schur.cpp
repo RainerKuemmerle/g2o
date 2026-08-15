@@ -27,6 +27,8 @@
 #include <memory>
 #include <vector>
 
+#include "gmock/gmock.h"
+
 #include "g2o/core/block_solver.h"
 #include "g2o/core/eigen_types.h"
 #include "g2o/core/optimization_algorithm_levenberg.h"
@@ -36,7 +38,6 @@
 #include "g2o/types/slam2d/edge_se2_pointxy.h"
 #include "g2o/types/slam2d/se2.h"
 #include "g2o/types/slam2d/vertex_point_xy.h"
-#include "gmock/gmock.h"
 
 namespace {
 

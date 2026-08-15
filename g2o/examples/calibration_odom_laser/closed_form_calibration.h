@@ -27,10 +27,10 @@
 #ifndef G2O_CLOSED_FORM_CALIBRATION_H
 #define G2O_CLOSED_FORM_CALIBRATION_H
 
-#include <Eigen/Core>
+#include "Eigen/Core"
 
-#include "g2o_calibration_odom_laser_api.h"
-#include "motion_information.h"
+#include "g2o/examples/calibration_odom_laser/g2o_calibration_odom_laser_api.h"
+#include "g2o/examples/calibration_odom_laser/motion_information.h"
 
 namespace g2o {
 

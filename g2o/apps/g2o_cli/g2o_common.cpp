@@ -24,14 +24,14 @@
 // NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 // SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-#include "g2o_common.h"
+#include "g2o/apps/g2o_cli/g2o_common.h"
 
 #include <cstdlib>
 #include <string>
 #include <string_view>
 #include <vector>
 
-#include "dl_wrapper.h"
+#include "g2o/apps/g2o_cli/dl_wrapper.h"
 #include "g2o/stuff/filesys_tools.h"
 #include "g2o/stuff/logger.h"
 #include "g2o/stuff/string_tools.h"
@@ -54,7 +54,7 @@
 #ifndef _GNU_SOURCE
 #define _GNU_SOURCE
 #endif
-#include <dlfcn.h>
+#include "dlfcn.h"
 namespace {
 Dl_info info;
 }

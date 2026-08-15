@@ -22,7 +22,7 @@
 
 namespace g2o {
 
-void declareCore(py::module& m) {
+void declareCore(py::module_& m) {
   declareIOFormat(m);
   declareHyperGraph(m);
   declareOptimizableGraph(m);
@@ -37,9 +37,13 @@ void declareCore(py::module& m) {
 
   declareEigenTypes(m);
   declareParameter(m);
+  declareParameterContainer(m);
   declareG2OBatchStatistics(m);
 
   declareJacobianWorkspace(m);
+  // NOTE: Base vertex/edge classes not exposed for Python subclassing
+  // due to complexity with pybind11 trampoline classes. Users can use
+  // VertexVectorX and VariableVectorXEdge for dynamic optimization variables.
   // declareBaseVertex(m);
   // declareBaseEdge(m);
   // declareBaseVariableSizedEdge(m);

@@ -157,11 +157,12 @@
 #ifndef G2O_CERES_PUBLIC_JET_H_
 #define G2O_CERES_PUBLIC_JET_H_
 
-#include <Eigen/Core>
 #include <cmath>
 #include <iosfwd>
 #include <iostream>  // NOLINT
 #include <limits>
+
+#include "Eigen/Core"
 
 namespace g2o::ceres {
 

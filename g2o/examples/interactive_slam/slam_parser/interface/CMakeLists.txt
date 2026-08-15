@@ -16,7 +16,10 @@ else()
   )
 endif()
 
-include_directories(${CMAKE_CURRENT_SOURCE_DIR}/../../)
+target_include_directories(interface_library PRIVATE
+  ${g2o_SOURCE_DIR}
+  ${CMAKE_CURRENT_SOURCE_DIR}/../..
+)
 
 set_target_properties(interface_library PROPERTIES OUTPUT_NAME ${LIB_PREFIX}interface)
 set_target_properties(interface_library PROPERTIES
