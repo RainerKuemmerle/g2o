@@ -4,7 +4,7 @@ build-backend = "scikit_build_core.build"
 
 [project]
 name = "g2opy"
-version = "2.2.0"
+version = "2.3.0"
 description="g2o: A General Framework for Graph Optimization"
 readme = "python/README.md"
 authors = [

@@ -56,6 +56,12 @@ jobs:
           - os: windows-latest
             python: 314
             platform_id: win_amd64
+          - os: windows-latest
+            python: 315
+            platform_id: win_amd64
+          - os: windows-latest
+            python: 316
+            platform_id: win_amd64
 
             ## Linux manylinux_2_28
           - os: ubuntu-latest
@@ -72,6 +78,14 @@ jobs:
             manylinux_image: manylinux_2_28
           - os: ubuntu-latest
             python: 314
+            platform_id: manylinux_x86_64
+            manylinux_image: manylinux_2_28
+          - os: ubuntu-latest
+            python: 315
+            platform_id: manylinux_x86_64
+            manylinux_image: manylinux_2_28
+          - os: ubuntu-latest
+            python: 316
             platform_id: manylinux_x86_64
             manylinux_image: manylinux_2_28
 
@@ -92,6 +106,14 @@ jobs:
             python: 314
             platform_id: manylinux_aarch64
             manylinux_image: manylinux_2_28
+          - os: ubuntu-24.04-arm
+            python: 315
+            platform_id: manylinux_aarch64
+            manylinux_image: manylinux_2_28
+          - os: ubuntu-24.04-arm
+            python: 316
+            platform_id: manylinux_aarch64
+            manylinux_image: manylinux_2_28
 
             ## MacOS x86_64
           - os: macos-15-intel
@@ -110,6 +132,14 @@ jobs:
             python: 314
             platform_id: macosx_x86_64
             manylinux_image: none
+          - os: macos-15-intel
+            python: 315
+            platform_id: macosx_x86_64
+            manylinux_image: none
+          - os: macos-15-intel
+            python: 316
+            platform_id: macosx_x86_64
+            manylinux_image: none
 
           ## MacOS arm64
           - os: macos-15
@@ -126,6 +156,14 @@ jobs:
             manylinux_image: none
           - os: macos-15
             python: 314
+            platform_id: macosx_arm64
+            manylinux_image: none
+          - os: macos-15
+            python: 315
+            platform_id: macosx_arm64
+            manylinux_image: none
+          - os: macos-15
+            python: 316
             platform_id: macosx_arm64
             manylinux_image: none
 
