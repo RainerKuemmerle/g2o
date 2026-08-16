@@ -518,7 +518,7 @@ bool BlockSolver<Traits>::solve() {
            "more than one block in _Hll column");
 
     // calculate inverse block for the landmark
-    const LandmarkMatrixType* D = marginalizeColumn.begin()->second;
+    const LandmarkMatrixType* D = marginalizeColumn.begin()->second.get();
     assert(D && D->rows() == D->cols() && "Error in landmark matrix");
     LandmarkMatrixType& Dinv = DInvSchur_->diagonal()[landmarkIndex];
     Dinv = D->inverse();

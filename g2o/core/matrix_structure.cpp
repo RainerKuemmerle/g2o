@@ -49,19 +49,21 @@ void MatrixStructure::alloc(int n_, int nz) {
   if (n == 0) {
     maxN_ = n = n_;
     maxNz_ = nz;
-    Ap = new int[maxN_ + 1];
-    Aii = new int[maxNz_];
+    apStorage_.assign(maxN_ + 1, 0);
+    aiiStorage_.assign(maxNz_, 0);
+    Ap = apStorage_.data();
+    Aii = aiiStorage_.data();
   } else {
     n = n_;
     if (maxNz_ < nz) {
       maxNz_ = 2 * nz;
-      delete[] Aii;
-      Aii = new int[maxNz_];
+      aiiStorage_.assign(maxNz_, 0);
+      Aii = aiiStorage_.data();
     }
     if (maxN_ < n) {
       maxN_ = 2 * n;
-      delete[] Ap;
-      Ap = new int[maxN_ + 1];
+      apStorage_.assign(maxN_ + 1, 0);
+      Ap = apStorage_.data();
     }
   }
 }
@@ -71,10 +73,10 @@ void MatrixStructure::free() {
   m = 0;
   maxN_ = 0;
   maxNz_ = 0;
-  delete[] Aii;
-  Aii = nullptr;
-  delete[] Ap;
+  apStorage_.clear();
+  aiiStorage_.clear();
   Ap = nullptr;
+  Aii = nullptr;
 }
 
 bool MatrixStructure::write(std::string_view filename) const {

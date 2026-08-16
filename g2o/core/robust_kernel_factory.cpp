@@ -37,7 +37,7 @@ std::unique_ptr<RobustKernelFactory> RobustKernelFactory::factoryInstance_;
 
 RobustKernelFactory* RobustKernelFactory::instance() {
   if (factoryInstance_ == nullptr) {
-    factoryInstance_.reset(new RobustKernelFactory);
+    factoryInstance_.reset(new RobustKernelFactory());
   }
 
   return factoryInstance_.get();

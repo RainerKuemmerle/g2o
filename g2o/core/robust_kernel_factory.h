@@ -60,7 +60,7 @@ template <typename T>
 class RobustKernelCreator : public AbstractRobustKernelCreator {
  public:
   std::shared_ptr<RobustKernel> construct() override {
-    return std::shared_ptr<RobustKernel>(new T());
+    return std::make_shared<T>();
   }
 };
 

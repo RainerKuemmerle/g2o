@@ -48,7 +48,7 @@ std::unique_ptr<OptimizationAlgorithmFactory>
 
 OptimizationAlgorithmFactory* OptimizationAlgorithmFactory::instance() {
   if (factoryInstance_ == nullptr) {
-    factoryInstance_.reset(new OptimizationAlgorithmFactory);
+    factoryInstance_.reset(new OptimizationAlgorithmFactory());
   }
   return factoryInstance_.get();
 }
