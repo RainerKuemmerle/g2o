@@ -29,13 +29,30 @@
 namespace g2o {
 
 bool EdgeStereoSE3ProjectXYZOnlyPose::read(std::istream& is) {
-  internal::readVector(is, _measurement);
-  return readInformationMatrix(is);
+  if (!internal::readVector(is, _measurement)) return false;
+  if (!readInformationMatrix(is)) return false;
+
+  // Optional trailing fields: world-frame landmark Xw and camera
+  // intrinsics (fx, fy, cx, cy, bf). Legacy files that omit these keep
+  // whatever was set on the edge at construction time (typically by
+  // the caller).
+  int c = is.peek();
+  while (c == ' ' || c == '\t') {
+    is.get();
+    c = is.peek();
+  }
+  if (c == '\n' || c == '\r' || c == EOF) return true;
+  is >> Xw[0] >> Xw[1] >> Xw[2]
+     >> fx >> fy >> cx >> cy >> bf;
+  return !is.fail();
 }
 
 bool EdgeStereoSE3ProjectXYZOnlyPose::write(std::ostream& os) const {
-  internal::writeVector(os, measurement());
-  return writeInformationMatrix(os);
+  if (!internal::writeVector(os, measurement())) return false;
+  if (!writeInformationMatrix(os)) return false;
+  os << " " << Xw[0] << " " << Xw[1] << " " << Xw[2]
+     << " " << fx << " " << fy << " " << cx << " " << cy << " " << bf;
+  return !os.fail();
 }
 
 void EdgeStereoSE3ProjectXYZOnlyPose::linearizeOplus() {
