@@ -42,16 +42,15 @@ bool EdgeSE3ProjectXYZOnlyPose::read(std::istream& is) {
     c = is.peek();
   }
   if (c == '\n' || c == '\r' || c == EOF) return true;
-  is >> Xw[0] >> Xw[1] >> Xw[2]
-     >> fx >> fy >> cx >> cy;
+  is >> Xw[0] >> Xw[1] >> Xw[2] >> fx >> fy >> cx >> cy;
   return !is.fail();
 }
 
 bool EdgeSE3ProjectXYZOnlyPose::write(std::ostream& os) const {
   if (!internal::writeVector(os, measurement())) return false;
   if (!writeInformationMatrix(os)) return false;
-  os << " " << Xw[0] << " " << Xw[1] << " " << Xw[2]
-     << " " << fx << " " << fy << " " << cx << " " << cy;
+  os << " " << Xw[0] << " " << Xw[1] << " " << Xw[2] << " " << fx << " " << fy
+     << " " << cx << " " << cy;
   return !os.fail();
 }
 
