@@ -36,14 +36,7 @@ bool EdgeStereoSE3ProjectXYZOnlyPose::read(std::istream& is) {
   // intrinsics (fx, fy, cx, cy, bf). Legacy files that omit these keep
   // whatever was set on the edge at construction time (typically by
   // the caller).
-  int c = is.peek();
-  while (c == ' ' || c == '\t') {
-    is.get();
-    c = is.peek();
-  }
-  if (c == '\n' || c == '\r' || c == EOF) return true;
-  is >> Xw[0] >> Xw[1] >> Xw[2] >> fx >> fy >> cx >> cy >> bf;
-  return !is.fail();
+  return internal::readOptional(is, Xw[0], Xw[1], Xw[2], fx, fy, cx, cy, bf);
 }
 
 bool EdgeStereoSE3ProjectXYZOnlyPose::write(std::ostream& os) const {

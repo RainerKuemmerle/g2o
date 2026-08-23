@@ -25,6 +25,8 @@
 // SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include <sstream>
+#include <string>
+#include <vector>
 
 #include "g2o/types/sim3/types_seven_dof_expmap.h"
 #include "gtest/gtest.h"
@@ -60,4 +62,85 @@ TEST(IoSim3, ReadWriteEdgeSim3ProjectXYZ) {
 
 TEST(IoSim3, ReadWriteEdgeInverseSim3ProjectXYZ) {
   readWriteVectorBasedEdge<EdgeInverseSim3ProjectXYZ>();
+}
+
+/*
+ * Optional trailing fields
+ *
+ * focal_length2, principle_point2 and the fix_scale flag were added to the
+ * record after the fact; vertices written before that must still read.
+ */
+namespace {
+
+// Serialize v and drop the last dropTokens tokens, emulating a record
+// written by a version of g2o that did not know about those fields.
+std::string recordWithoutLastTokens(const VertexSim3Expmap& v, int dropTokens) {
+  std::stringstream full;
+  v.write(full);
+
+  std::istringstream iss(full.str());
+  std::vector<std::string> tokens;
+  for (std::string t; iss >> t;) tokens.push_back(t);
+
+  EXPECT_GT(static_cast<int>(tokens.size()), dropTokens)
+      << "test needs a record longer than the number of dropped tokens";
+
+  std::string out;
+  for (int i = 0; i + dropTokens < static_cast<int>(tokens.size()); ++i)
+    out += tokens[i] + " ";
+  return out;
+}
+
+void fillVertex(VertexSim3Expmap& v) {
+  v.setEstimate(RandomSim3::create());
+  v._focal_length1 = Vector2(100., 200.);
+  v._principle_point1 = Vector2(300., 400.);
+  v._focal_length2 = Vector2(500., 600.);
+  v._principle_point2 = Vector2(700., 800.);
+  v._fix_scale = true;
+}
+
+}  // namespace
+
+TEST(IoSim3, VertexSim3ExpmapRoundTripsOptionalFields) {
+  VertexSim3Expmap out;
+  fillVertex(out);
+
+  std::stringstream data;
+  ASSERT_TRUE(out.write(data));
+
+  VertexSim3Expmap in;
+  ASSERT_TRUE(in.read(data));
+  EXPECT_TRUE(out._focal_length2.isApprox(in._focal_length2, 1e-9));
+  EXPECT_TRUE(out._principle_point2.isApprox(in._principle_point2, 1e-9));
+  EXPECT_TRUE(in._fix_scale);
+}
+
+TEST(IoSim3, VertexSim3ExpmapReadsRecordWithoutOptionalFields) {
+  VertexSim3Expmap out;
+  fillVertex(out);
+  // Drop focal_length2 (2), principle_point2 (2) and fix_scale (1).
+  std::stringstream data(recordWithoutLastTokens(out, 5));
+
+  VertexSim3Expmap in;
+  in._focal_length2 = Vector2(11., 12.);
+  in._principle_point2 = Vector2(13., 14.);
+  in._fix_scale = true;
+  ASSERT_TRUE(in.read(data)) << "record without optional fields was rejected";
+  EXPECT_TRUE(out._focal_length1.isApprox(in._focal_length1, 1e-9));
+  EXPECT_TRUE(out._principle_point1.isApprox(in._principle_point1, 1e-9));
+  EXPECT_TRUE(Vector2(11., 12.).isApprox(in._focal_length2, 1e-9));
+  EXPECT_TRUE(Vector2(13., 14.).isApprox(in._principle_point2, 1e-9));
+  EXPECT_TRUE(in._fix_scale) << "absent fix_scale flag must be left alone";
+}
+
+TEST(IoSim3, VertexSim3ExpmapRejectsTruncatedOptionalFields) {
+  VertexSim3Expmap out;
+  fillVertex(out);
+  // focal_length2 present, principle_point2 and fix_scale cut short.
+  std::stringstream data(recordWithoutLastTokens(out, 3));
+
+  VertexSim3Expmap in;
+  EXPECT_FALSE(in.read(data))
+      << "read() accepted a record whose optional fields were cut short";
 }

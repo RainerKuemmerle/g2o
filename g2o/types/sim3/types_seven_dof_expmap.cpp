@@ -65,22 +65,12 @@ bool VertexSim3Expmap::read(std::istream& is) {
   if (!internal::readVector(is, _principle_point1)) return false;
   setEstimate(Sim3(cam2world).inverse());
 
-  // Optional trailing fields added later: focal_length2, principle_point2,
-  // and an integer fix_scale flag. Skip inline whitespace but stop at
-  // newline / EOF so legacy single-line records (with only
-  // focal_length1 / principle_point1) still parse correctly.
-  int c = is.peek();
-  while (c == ' ' || c == '\t') {
-    is.get();
-    c = is.peek();
-  }
-  if (c == '\n' || c == '\r' || c == EOF) return true;
-  if (!internal::readVector(is, _focal_length2)) return false;
-  if (!internal::readVector(is, _principle_point2)) return false;
-  int fixScale = 0;
-  is >> fixScale;
-  _fix_scale = (fixScale != 0);
-  return !is.fail();
+  // Optional trailing fields added later: focal_length2, principle_point2
+  // and the fix_scale flag. Records written before they existed end here
+  // and keep the values they were constructed with.
+  return internal::readOptional(is, _focal_length2[0], _focal_length2[1],
+                                _principle_point2[0], _principle_point2[1],
+                                _fix_scale);
 }
 
 bool VertexSim3Expmap::write(std::ostream& os) const {
@@ -91,7 +81,7 @@ bool VertexSim3Expmap::write(std::ostream& os) const {
   if (!internal::writeVector(os, _principle_point1)) return false;
   if (!internal::writeVector(os, _focal_length2)) return false;
   if (!internal::writeVector(os, _principle_point2)) return false;
-  os << (_fix_scale ? 1 : 0) << " ";
+  os << _fix_scale << " ";
   return !os.fail();
 }
 

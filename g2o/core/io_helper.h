@@ -29,6 +29,8 @@
 
 #include <Eigen/Core>
 #include <iosfwd>
+#include <istream>
+#include <string>
 
 namespace g2o {
 namespace internal {
@@ -41,6 +43,39 @@ bool writeVector(std::ostream& os, const Eigen::DenseBase<Derived>& b) {
 template <typename Derived>
 bool readVector(std::istream& is, Eigen::DenseBase<Derived>& b) {
   for (int i = 0; i < b.size() && !is.fail(); i++) is >> b(i);
+  return !is.fail();
+}
+
+/**
+ * @brief Whether the current line holds another token.
+ *
+ * Consumes blanks up to the first non-blank character. Deliberately stops at
+ * the end of the line: std::ws would consume the newline as well and let the
+ * optional trailing fields of one record steal the tokens of the next one. A
+ * trailing '\r' (CRLF input) counts as end of line.
+ */
+inline bool hasDataOnLine(std::istream& is) {
+  using Traits = std::char_traits<char>;
+  Traits::int_type c = is.peek();
+  while (c == ' ' || c == '\t') {
+    is.get();
+    c = is.peek();
+  }
+  return c != '\n' && c != '\r' && !Traits::eq_int_type(c, Traits::eof());
+}
+
+/**
+ * @brief Read optional trailing fields of a record.
+ *
+ * If the line ends here the fields are left untouched, so records written by
+ * an older version of g2o keep whatever the constructor (or the caller) set.
+ * Otherwise the fields are all-or-nothing: a short or garbled tail is an
+ * error.
+ */
+template <typename... Ts>
+bool readOptional(std::istream& is, Ts&... fields) {
+  if (!hasDataOnLine(is)) return true;
+  (is >> ... >> fields);
   return !is.fail();
 }
 }  // namespace internal

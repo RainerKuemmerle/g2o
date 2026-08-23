@@ -37,14 +37,7 @@ bool EdgeSE3ProjectXYZ::read(std::istream& is) {
 
   // Optional trailing camera intrinsics (fx, fy, cx, cy). Legacy files
   // that omit these keep the default values set at construction time.
-  int c = is.peek();
-  while (c == ' ' || c == '\t') {
-    is.get();
-    c = is.peek();
-  }
-  if (c == '\n' || c == '\r' || c == EOF) return true;
-  is >> fx >> fy >> cx >> cy;
-  return !is.fail();
+  return internal::readOptional(is, fx, fy, cx, cy);
 }
 
 bool EdgeSE3ProjectXYZ::write(std::ostream& os) const {
