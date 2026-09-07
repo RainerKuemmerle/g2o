@@ -54,7 +54,7 @@ static OptimizationAlgorithm* createSolver(const std::string& fullSolverName) {
           {"dense3_2", &AllocateSolver<3, 2>},
           {"dense6_3", &AllocateSolver<6, 3>},
           {"dense7_3", &AllocateSolver<7, 3>},
-      };
+  };
 
   string solverName = fullSolverName.substr(3);
   auto solverf = solver_factories.find(solverName);

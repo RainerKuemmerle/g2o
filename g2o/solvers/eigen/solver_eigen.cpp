@@ -66,7 +66,7 @@ static OptimizationAlgorithm* createSolver(const std::string& fullSolverName) {
           {"fix3_2_scalar", &AllocateSolver<3, 2, false>},
           {"fix6_3_scalar", &AllocateSolver<6, 3, false>},
           {"fix7_3_scalar", &AllocateSolver<7, 3, false>},
-      };
+  };
 
   string solverName = fullSolverName.substr(3);
   auto solverf = solver_factories.find(solverName);
