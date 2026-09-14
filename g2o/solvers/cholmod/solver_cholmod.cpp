@@ -64,7 +64,7 @@ static OptimizationAlgorithm* createSolver(const std::string& fullSolverName) {
           {"fix6_3_cholmod_scalar", &AllocateSolver<6, 3, false>},
           {"fix7_3_cholmod_scalar", &AllocateSolver<7, 3, false>},
 #endif
-      };
+  };
 
   string solverName = fullSolverName.substr(3);
   auto solverf = solver_factories.find(solverName);
