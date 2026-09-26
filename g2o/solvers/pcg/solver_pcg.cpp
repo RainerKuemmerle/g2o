@@ -54,7 +54,7 @@ static OptimizationAlgorithm* createSolver(const std::string& fullSolverName) {
           {"pcg3_2", &AllocateSolver<3, 2>},
           {"pcg6_3", &AllocateSolver<6, 3>},
           {"pcg7_3", &AllocateSolver<7, 3>},
-      };
+  };
 
   string solverName = fullSolverName.substr(3);
   auto solverf = solver_factories.find(solverName);
