@@ -151,7 +151,7 @@ void SparseOptimizer::printGraphSummary(std::ostream& os) const {
         nLandmarks++;
     }
     for (const auto& e : edges()) {
-      auto oe = static_cast<OptimizableGraph::Edge*>(e.get());
+      auto* oe = static_cast<OptimizableGraph::Edge*>(e.get());
       if (oe) {
         levels.insert(oe->level());
       }
@@ -177,7 +177,7 @@ int SparseOptimizer::numConnectedComponents(int level) const {
     explicit LevelCostFunction(int level_) : level(level_) {}
     double operator()(HyperGraph::Edge* edge, HyperGraph::Vertex* /*from*/,
                       HyperGraph::Vertex* /*to*/) override {
-      auto oe = static_cast<OptimizableGraph::Edge*>(edge);
+      auto* oe = static_cast<OptimizableGraph::Edge*>(edge);
       if (!oe || oe->level() != level) {
         return std::numeric_limits<double>::max();
       }
@@ -472,6 +472,13 @@ void SparseOptimizer::computeInitialGuess(
 }
 
 int SparseOptimizer::optimize(int iterations, bool online) {
+  if (algorithm_ == nullptr) {
+    G2O_WARN(
+        "No optimization algorithm set, maybe forgot to call "
+        "setAlgorithm()");
+    return -1;
+  }
+
   if (ivMap_.empty()) {
     G2O_WARN(
         "0 vertices to optimize, maybe forgot to call "
@@ -591,6 +598,13 @@ bool SparseOptimizer::updateInitialization(HyperGraph::VertexSet& vset,
     G2O_ERROR("something went wrong, size mismatch {} != {}", vset.size(),
               newVertices.size());
   }
+  if (algorithm_ == nullptr) {
+    G2O_WARN(
+        "No optimization algorithm set, maybe forgot to call "
+        "setAlgorithm()");
+    return false;
+  }
+
   return algorithm_->updateStructure(newVertices, eset);
 }
 
@@ -660,6 +674,13 @@ void SparseOptimizer::setAlgorithm(
 bool SparseOptimizer::computeMarginals(
     SparseBlockMatrix<MatrixX>& spinv,
     const std::vector<std::pair<int, int> >& blockIndices) {
+  if (algorithm_ == nullptr) {
+    G2O_WARN(
+        "No optimization algorithm set, maybe forgot to call "
+        "setAlgorithm()");
+    return false;
+  }
+
   return algorithm_->computeMarginals(spinv, blockIndices);
 }
 
