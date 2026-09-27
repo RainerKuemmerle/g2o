@@ -1,3 +1,4 @@
+[ ] Investigate whether g2o/types/slam3d/se3quat.cpp itself should be corrected so the abs(d) > 0.99999 branch is no longer shared by near-identity and near-pi rotations.
 [ ] updateCache into CRTP/functor to avoid call of virtual method
 [ ] Investigate CRTP for edges
 [x] unit test for Schur complement
