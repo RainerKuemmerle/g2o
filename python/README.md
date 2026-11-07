@@ -89,6 +89,7 @@ edge.set_vertex(0, vertex)
 edge.set_measurement(np.array([1.5, 2.5, 3.5]))
 edge.set_information(np.eye(3))
 
+
 # Subclass for custom behavior
 class CustomEdge(g2opy.VariableVectorXEdge):
     def __init__(self) -> None:
