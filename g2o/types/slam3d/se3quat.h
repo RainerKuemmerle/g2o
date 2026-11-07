@@ -40,6 +40,10 @@
 namespace g2o {
 
 class G2O_TYPES_SLAM3D_API SE3Quat {
+ public:
+  static constexpr double kLogNearIdentityThreshold = 0.99999;
+  static constexpr double kExpSmallAngleThreshold = 1e-5;
+
  protected:
   Quaternion r_;
   Vector3 t_;

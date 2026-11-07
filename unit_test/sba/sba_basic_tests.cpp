@@ -160,3 +160,39 @@ TEST(SBA, EdgeSE3ExpmapJacobian) {
                              [](const double, const double) { return 5e-3; });
   }
 }
+
+TEST(SBA, EdgeSE3ExpmapJacobianNearPi) {
+  auto v1 = std::make_shared<g2o::VertexSE3Expmap>();
+  v1->setId(0);
+
+  auto v2 = std::make_shared<g2o::VertexSE3Expmap>();
+  v2->setId(1);
+
+  g2o::EdgeSE3Expmap e;
+  e.setVertex(0, v1);
+  e.setVertex(1, v2);
+  e.setInformation(g2o::EdgeSE3Expmap::InformationType::Identity());
+
+  const double theta = std::acos(-0.999999);
+  const g2o::Vector3 axis = g2o::Vector3::UnitX();
+  const g2o::Quaternion q = g2o::Quaternion(Eigen::AngleAxisd(theta, axis));
+  v1->setEstimate(g2o::SE3Quat(q, g2o::Vector3(0.3, -0.2, 0.5)));
+  v2->setEstimate(
+      g2o::SE3Quat(g2o::Quaternion::Identity(), g2o::Vector3(0.7, -0.1, 0.4)));
+  e.setMeasurement(
+      g2o::SE3Quat(g2o::Quaternion(Eigen::AngleAxisd(theta * 0.9, axis)),
+                   g2o::Vector3(-0.4, 0.6, 0.2)));
+
+  g2o::JacobianWorkspace jacobianWorkspace;
+  g2o::JacobianWorkspace numericJacobianWorkspace;
+  numericJacobianWorkspace.updateSize(e);
+  numericJacobianWorkspace.allocate();
+
+  evaluateJacobianWithStep(e, jacobianWorkspace, numericJacobianWorkspace, 1e-6,
+                           [](const double, const double) { return 5e-2; });
+
+  const g2o::Vector6 log = v1->estimate().log();
+  EXPECT_NEAR(log[0], theta, 1e-4);
+  EXPECT_NEAR(log[1], 0.0, 1e-6);
+  EXPECT_NEAR(log[2], 0.0, 1e-6);
+}
