@@ -34,8 +34,8 @@ void templatedSparseBlockMatrix(py::module_& m, const std::string& suffix) {
       .def("non_zeros_blocks", &CLS::nonZeroBlocks)
       .def("scale", &CLS::scale)
       .def("block_cols",
-           static_cast<const std::vector<typename CLS::IntBlockMap>& (
-               CLS::*)(void) const>(&CLS::blockCols),
+           static_cast<const std::vector<typename CLS::IntBlockMap>& (CLS::*)(
+               void) const>(&CLS::blockCols),
            py::rv_policy::reference_internal)
       .def("row_block_indices",
            static_cast<const std::vector<int>& (CLS::*)(void) const>(
