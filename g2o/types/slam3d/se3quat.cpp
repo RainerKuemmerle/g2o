@@ -122,7 +122,7 @@ Vector6 SE3Quat::log() const {
 
   Vector3 omega;
   Matrix3 V_inv;
-  if (std::abs(d) > cst(0.99999)) {
+  if (d > SE3Quat::kLogNearIdentityThreshold) {
     omega = 0.5 * dR;
     const Matrix3 Omega = skew(omega);
     V_inv = Matrix3::Identity() - cst(0.5) * Omega +
@@ -158,7 +158,7 @@ SE3Quat SE3Quat::exp(const Vector6& update) {
   Matrix3 R;
   Matrix3 V;
   const Matrix3 Omega2 = Omega * Omega;
-  if (theta < cst(0.00001)) {
+  if (theta < SE3Quat::kExpSmallAngleThreshold) {
     R = (Matrix3::Identity() + Omega + cst(0.5) * Omega2);
     V = (Matrix3::Identity() + cst(0.5) * Omega + cst(1.) / cst(6.) * Omega2);
   } else {

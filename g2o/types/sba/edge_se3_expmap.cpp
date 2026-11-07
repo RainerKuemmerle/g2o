@@ -97,7 +97,7 @@ Matrix6 se3CurrentLogDerivative(const SE3Quat& transform) {
   const Matrix3 rotation = transform.rotation().toRotationMatrix();
   const double trace = rotation.trace();
   const double d = cst(0.5) * (trace - cst(1.));
-  if (std::abs(d) <= cst(0.99999)) {
+  if (d <= SE3Quat::kLogNearIdentityThreshold) {
     return se3LeftJacobianInverse(transform.log());
   }
 
