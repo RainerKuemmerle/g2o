@@ -27,6 +27,7 @@
 #ifndef EVALUATE_JACOBIAN_H
 #define EVALUATE_JACOBIAN_H
 
+#include <algorithm>
 #include <functional>
 
 #include "Eigen/Core"
@@ -66,12 +67,20 @@ template <typename EdgeType>
 void evaluateJacobianUnary(EdgeType& e, JacobianWorkspace& jacobianWorkspace,
                            JacobianWorkspace& numericJacobianWorkspace,
                            const EpsilonFunction& eps = internal::epsilon) {
-  // calling the analytic Jacobian but writing to the numeric workspace
+  numericJacobianWorkspace.updateSize(e);
+  numericJacobianWorkspace.allocate();
+  jacobianWorkspace.updateSize(e);
+  jacobianWorkspace.allocate();
+
+  // Compute the analytic Jacobian into the numeric workspace first, then take
+  // an explicit deep copy before the numeric linearization overwrites it.
   e.BaseUnaryEdge<EdgeType::kDimension, typename EdgeType::Measurement,
                   typename EdgeType::VertexXiType>::
       linearizeOplus(numericJacobianWorkspace);
-  // copy result into analytic workspace
-  jacobianWorkspace = numericJacobianWorkspace;
+  const int numElems =
+      EdgeType::kDimension * EdgeType::VertexXiType::kDimension;
+  std::copy_n(numericJacobianWorkspace.workspaceForVertex(0), numElems,
+              jacobianWorkspace.workspaceForVertex(0));
 
   // compute the numeric Jacobian into the numericJacobianWorkspace workspace as
   // setup by the previous call
@@ -79,8 +88,6 @@ void evaluateJacobianUnary(EdgeType& e, JacobianWorkspace& jacobianWorkspace,
                   typename EdgeType::VertexXiType>::linearizeOplus();
 
   // compare the Jacobians
-  int numElems = EdgeType::kDimension;
-  numElems *= EdgeType::VertexXiType::kDimension;
   VectorX::ConstMapType n(numericJacobianWorkspace.workspaceForVertex(0),
                           numElems);
   VectorX::ConstMapType a(jacobianWorkspace.workspaceForVertex(0), numElems);
@@ -92,13 +99,24 @@ template <typename EdgeType>
 void evaluateJacobian(EdgeType& e, JacobianWorkspace& jacobianWorkspace,
                       JacobianWorkspace& numericJacobianWorkspace,
                       const EpsilonFunction& eps = internal::epsilon) {
-  // calling the analytic Jacobian but writing to the numeric workspace
+  numericJacobianWorkspace.updateSize(e);
+  numericJacobianWorkspace.allocate();
+  jacobianWorkspace.updateSize(e);
+  jacobianWorkspace.allocate();
+
+  // Compute the analytic Jacobian into the numeric workspace first, then take
+  // an explicit deep copy before the numeric linearization overwrites it.
   e.BaseBinaryEdge<EdgeType::kDimension, typename EdgeType::Measurement,
                    typename EdgeType::VertexXiType,
                    typename EdgeType::VertexXjType>::
       linearizeOplus(numericJacobianWorkspace);
-  // copy result into analytic workspace
-  jacobianWorkspace = numericJacobianWorkspace;
+  for (int i = 0; i < 2; ++i) {
+    const int numElems =
+        EdgeType::kDimension * (i == 0 ? EdgeType::VertexXiType::kDimension
+                                       : EdgeType::VertexXjType::kDimension);
+    std::copy_n(numericJacobianWorkspace.workspaceForVertex(i), numElems,
+                jacobianWorkspace.workspaceForVertex(i));
+  }
 
   // compute the numeric Jacobian into the numericJacobianWorkspace workspace as
   // setup by the previous call
