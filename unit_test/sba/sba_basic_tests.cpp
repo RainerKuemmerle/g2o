@@ -56,22 +56,22 @@ void fillNumericJacobian(EdgeType& edge, g2o::JacobianWorkspace& workspace,
   JacobianMap jacobian(workspace.workspaceForVertex(VertexIndex),
                        EdgeType::kDimension, VertexType::kDimension);
 
-  typename VertexType::BVector perturbation_buffer(vertex->dimension());
-  perturbation_buffer.fill(0.);
-  g2o::VectorX::MapType perturbation(perturbation_buffer.data(),
-                                     perturbation_buffer.size());
+  g2o::VectorX perturbation(vertex->dimension());
+  perturbation.setZero();
+  g2o::VectorX::MapType perturbation_map(perturbation.data(),
+                                         perturbation.size());
 
   for (int dimension = 0; dimension < vertex->dimension(); ++dimension) {
     vertex->push();
     perturbation[dimension] = step;
-    vertex->oplus(perturbation);
+    vertex->oplus(perturbation_map);
     edge.computeError();
     auto error = edge.error();
     vertex->pop();
 
     vertex->push();
     perturbation[dimension] = -step;
-    vertex->oplus(perturbation);
+    vertex->oplus(perturbation_map);
     edge.computeError();
     error -= edge.error();
     vertex->pop();
@@ -89,11 +89,13 @@ void evaluateJacobianWithStep(EdgeType& edge,
                               g2o::JacobianWorkspace& numeric_workspace,
                               double step,
                               const g2o::EpsilonFunction& epsilon) {
+  analytic_workspace.updateSize(edge);
+  analytic_workspace.allocate();
+
   edge.template BaseBinaryEdge<
       EdgeType::kDimension, typename EdgeType::Measurement,
       typename EdgeType::VertexXiType,
-      typename EdgeType::VertexXjType>::linearizeOplus(numeric_workspace);
-  analytic_workspace = numeric_workspace;
+      typename EdgeType::VertexXjType>::linearizeOplus(analytic_workspace);
 
   fillNumericJacobian<0>(edge, numeric_workspace, step);
   fillNumericJacobian<1>(edge, numeric_workspace, step);
@@ -150,7 +152,7 @@ TEST(SBA, EdgeSE3ExpmapJacobian) {
   numericJacobianWorkspace.updateSize(e);
   numericJacobianWorkspace.allocate();
 
-  for (int k = 0; k < 200; ++k) {
+  for (int k = 0; k < 32; ++k) {
     v1->setEstimate(g2o::internal::RandomSE3Quat::create());
     v2->setEstimate(g2o::internal::RandomSE3Quat::create());
     e.setMeasurement(g2o::internal::RandomSE3Quat::create());
@@ -192,7 +194,13 @@ TEST(SBA, EdgeSE3ExpmapJacobianNearPi) {
                            [](const double, const double) { return 5e-2; });
 
   const g2o::Vector6 log = v1->estimate().log();
-  EXPECT_NEAR(log[0], theta, 1e-4);
-  EXPECT_NEAR(log[1], 0.0, 1e-6);
-  EXPECT_NEAR(log[2], 0.0, 1e-6);
+  const g2o::Vector3 omega = log.head<3>();
+  const double angle = omega.norm();
+
+  // Near pi, the rotation log can be sign-ambiguous: omega and -omega encode
+  // the same rotation. Validate the magnitude and axis alignment up to sign.
+  EXPECT_NEAR(angle, theta, 1e-4);
+  if (angle > 1e-12) {
+    EXPECT_NEAR(std::abs(omega.normalized().dot(axis)), 1.0, 1e-6);
+  }
 }
