@@ -167,6 +167,30 @@ jobs:
           CIBW_MANYLINUX_AARCH64_IMAGE: ${{ matrix.manylinux_image }}
           MACOSX_DEPLOYMENT_TARGET: 10.15
 
+      - uses: actions/setup-python@v5
+        if: matrix.python == 315
+        with:
+          python-version: '3.15'
+
+      - name: Verify wheel stub
+        if: matrix.python == 315
+        shell: bash
+        run: |
+          python -m pip install --upgrade pip
+          python -m pip install --force-reinstall --no-deps ./wheelhouse/*.whl
+          python - <<'PY'
+          import pathlib
+          import g2opy
+
+          pkg_dir = pathlib.Path(g2opy.__file__).resolve().parent
+          assert (pkg_dir / 'py.typed').is_file(), f'missing py.typed in {pkg_dir}'
+          assert (pkg_dir / '__init__.pyi').is_file(), f'missing __init__.pyi in {pkg_dir}'
+          assert hasattr(g2opy, 'SE2'), 'g2opy does not expose SE2 from the installed package'
+          print(f'OK: {pkg_dir}')
+          print(f'stub: {pkg_dir / "__init__.pyi"}')
+          print(f'marker: {pkg_dir / "py.typed"}')
+          PY
+
       - uses: actions/upload-artifact@v4
         with:
           name: cibw-wheels-${{ matrix.os }}-${{ strategy.job-index }}
