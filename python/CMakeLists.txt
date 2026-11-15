@@ -78,7 +78,17 @@ target_link_libraries(g2opy PRIVATE
     types_slam3d_addons
 )
 target_include_directories(g2opy PRIVATE ${CMAKE_CURRENT_SOURCE_DIR})
+
 install(TARGETS g2opy LIBRARY DESTINATION g2opy)
+
+nanobind_add_stub(
+    g2opy_stub
+    INSTALL_TIME
+    MODULE g2opy
+    OUTPUT g2opy/__init__.pyi
+    PYTHON_PATH "."
+    MARKER_FILE g2opy/py.typed
+)
 
 #Write pytest helper script to build folder
 file(WRITE "${CMAKE_BINARY_DIR}/pytest_helper.sh" "#!/bin/sh
